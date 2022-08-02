@@ -2,7 +2,7 @@
 CC := clang
 CCFLAGS :=
 DBGFLAGS := -g
-CCFLAGS_TEST := -I/usr/local/include/criterion
+CCFLAGS_TEST := $(CCFLAGS) -I/usr/local/include/criterion
 CCOBJFLAGS := $(CCFLAGS) -c
 CCLIBS := -lm 
 CCLIBS_TEST := $(CCLIBS) -lcriterion
@@ -16,17 +16,19 @@ DEBUG_PATH := debug
 
 # Source files
 SRC := $(foreach x, $(SRC_PATH), $(wildcard $(addprefix $(x)/*, .c*)))
-SRC_TEST := $(foreach x, $(SRC_TEST_PATH), $(wildcard $(addprefix $(x)/*, .c*)))
+SRC_TEST := $(filter-out $(SRC_PATH)/main.c, $(SRC)) $(foreach x, $(SRC_TEST_PATH), $(wildcard $(addprefix $(x)/*, .c*)))
+
+# Object files
 OBJ := $(addprefix $(OBJ_PATH)/, $(addsuffix .o, $(notdir $(basename $(SRC)))))
 OBJ_DEBUG := $(addprefix $(DEBUG_PATH)/, $(addsuffix .o, $(notdir $(basename $(SRC)))))
+OBJ_TEST := $(filter-out $(OBJ_PATH)/main.o, $(OBJ)) $(addprefix $(OBJ_PATH)/, $(addsuffix .o, $(notdir $(basename $(SRC_TEST))))) 
 
 # Compile macros
 TARGET_NAME := ocr
+TARGET_NAME_TEST := test
 ifeq ($(OS), Windows_NT)
 	TARGET_NAME := $(addsuffix .exe, $(TARGET_NAME))
 endif
-
-TARGET_NAME_TEST := ocr_test
 
 TARGET := $(BIN_PATH)/$(TARGET_NAME)
 TARGET_DEBUG := $(DEBUG_PATH)/$(TARGET_NAME)
@@ -38,6 +40,7 @@ DISTCLEAN_LIST = $(OBJ) \
 
 CLEAN_LIST = $(TARGET) \
 				$(TARGET_DEBUG) \
+				$(TARGET_TEST) \
 				$(DISTCLEAN_LIST)
 
 # Default rule:
@@ -56,8 +59,10 @@ $(DBG_PATH)/%.o : $(SRC_PATH)/%.c*
 $(TARGET_DEBUG) : $(OBJ_DEBUG)
 	$(CC) $(CCFLAGS) $(DBGFLAGS) $(OBJ_DEBUG) -o $@ $(CCLIBS)
 
-$(TARGET_TEST) : $(OBJ)
-	$(CC) $(CCFLAGS_TEST) -o $@ $(OBJ) $(CCLIBS_TEST) 
+$(TARGET_TEST) : $(OBJ_TEST)
+	@echo $(SRC_TEST)
+	@echo $(OBJ_TEST)
+	$(CC) $(CCFLAGS_TEST) -o $@ $(OBJ_TEST) $(CCLIBS_TEST) 
 
 # Phony rules
 .PHONY: run
