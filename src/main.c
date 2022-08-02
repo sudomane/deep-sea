@@ -3,6 +3,7 @@
 #include <time.h>
 
 #include "network.h"
+#include "utils.h"
 
 int main()
 {
@@ -19,5 +20,8 @@ int main()
 	display_network(network);
 	free_network(network);
 
+	//float y = (1.f * 0.840188f + 0.f * 0.394383 - 0.335223);
+	//y = sigmoid(y);
+	//printf("final y: %f\n", y);
 	return 0;
 }

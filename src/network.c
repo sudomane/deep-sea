@@ -35,7 +35,12 @@ void free_network(network_t* network)
 
 void display_network(network_t* network)
 {
-    printf("Activation network:\n");
+    printf("Bias:\n");
+    for (size_t i = 0; i < N_HIDDEN_LAYER+1; i++)
+    {
+        printf("%f ", network->bias[i]);
+    }
+    printf("\nActivation network:\n");
     display_matrix(network->activation_network);
     
     printf("\nWeights network:\n");
@@ -111,7 +116,7 @@ void feed_forward(network_t* network)
                 activation += x*w;
             }
         
-            activation = sigmoid(activation - network->bias[n]);
+            activation = sigmoid(activation - network->bias[n-1]);
             set_at(network->activation_network, i, n, activation);
         }
     }

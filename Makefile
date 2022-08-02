@@ -2,7 +2,7 @@
 CC := clang
 CCFLAGS :=
 DBGFLAGS := -g
-CCFLAGS_TEST := $(CCFLAGS) -I/usr/local/include/criterion
+CCFLAGS_TEST := -I/usr/local/include/criterion
 CCOBJFLAGS := $(CCFLAGS) -c
 CCLIBS := -lm 
 CCLIBS_TEST := $(CCLIBS) -lcriterion
@@ -36,7 +36,8 @@ TARGET_TEST := $(BIN_PATH)/$(TARGET_NAME_TEST)
 
 # Clean files list
 DISTCLEAN_LIST = $(OBJ) \
-					$(OBJ_DEBUG)
+					$(OBJ_DEBUG) \
+					$(OBJ_TEST)
 
 CLEAN_LIST = $(TARGET) \
 				$(TARGET_DEBUG) \
@@ -53,6 +54,9 @@ $(TARGET) : $(OBJ)
 $(OBJ_PATH)/%.o : $(SRC_PATH)/%.c*
 	$(CC) $(CCOBJFLAGS) -o $@ $< $(CCLIBS)
 
+$(OBJ_PATH)/%.o : $(SRC_TEST_PATH)/%.c*
+	$(CC) $(CCOBJFLAGS) -o $@ $< $(CCLIBS)
+
 $(DBG_PATH)/%.o : $(SRC_PATH)/%.c*
 	$(CC) $(CCOBJFLAGS) $(DBGFLAGS) -o $@ $< $(CCLIBS)
 
@@ -60,9 +64,7 @@ $(TARGET_DEBUG) : $(OBJ_DEBUG)
 	$(CC) $(CCFLAGS) $(DBGFLAGS) $(OBJ_DEBUG) -o $@ $(CCLIBS)
 
 $(TARGET_TEST) : $(OBJ_TEST)
-	@echo $(SRC_TEST)
-	@echo $(OBJ_TEST)
-	$(CC) $(CCFLAGS_TEST) -o $@ $(OBJ_TEST) $(CCLIBS_TEST) 
+	$(CC) $(CCFLAGS) $(CCFLAGS_TEST) -o $@ $(OBJ_TEST) $(CCLIBS_TEST) 
 
 # Phony rules
 .PHONY: run

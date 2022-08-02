@@ -14,7 +14,7 @@ typedef struct
     matrix_2D_t* activation_network; // Matrix containing activation values
     matrix_2D_t* weights_network; // Matrix containing weights for each layer
     
-    double bias[N_HIDDEN_LAYER + 2]; // Bias for every hidden layer + output layer
+    double bias[N_HIDDEN_LAYER + 1]; // Bias for every hidden layer + output layer
 } network_t;
 
 network_t* init_network();
