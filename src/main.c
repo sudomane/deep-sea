@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <sys/time.h>
 
 #include "network.h"
 #include "utils.h"
@@ -14,15 +15,18 @@ int main()
 	
 	double input[INPUT_SIZE] = { 1.0f, 0.0f };
 	init_input(network, input);
+	summary(network, 0);
 
-	display_network(network);
+	clock_t t_1, t_2;
+
+	t_1 = clock();
 	feed_forward(network);
-	printf("\nAFTER FEEDFORWARD\n\n");
-	display_network(network);
+	t_2 = clock();
+
+	clock_t delta = t_2 - t_1;
+	printf("Time to compute: %ld ms\n", delta);
+
 	free_network(network);
 
-	//float y = (1.f * 0.840188f + 0.f * 0.394383 - 0.335223);
-	//y = sigmoid(y);
-	//printf("final y: %f\n", y);
 	return 0;
 }

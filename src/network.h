@@ -1,11 +1,11 @@
 #ifndef NETWORK_H
 #define NETWORK_H
 
-#define INPUT_SIZE 2
-#define HIDDEN_SIZE 2
-#define OUTPUT_SIZE 1  
+#define INPUT_SIZE 100
+#define HIDDEN_SIZE 140
+#define OUTPUT_SIZE 100
 
-#define N_HIDDEN_LAYER 1
+#define N_HIDDEN_LAYER 100
 
 #include "matrix.h"
 
@@ -19,13 +19,17 @@ typedef struct
 
 network_t* init_network();
 void free_network(network_t* network);
-void display_network(network_t* network);
+void summary(network_t* network, int verbose);
 
 void init_weights(network_t* network);
 void init_bias(network_t* network);
 void init_input(network_t* network, double* input);
 
 void feed_forward(network_t* network);
+
+// TODO: IMPLEMENT THESE!
+void back_propagation(network_t* network_t);
+void cost_function(network_t* network_t);
 
 
 #endif // NETWORK_H

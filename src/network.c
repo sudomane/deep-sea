@@ -33,18 +33,30 @@ void free_network(network_t* network)
     free(network);
 }
 
-void display_network(network_t* network)
+void summary(network_t* network, int verbose)
 {
-    printf("Bias:\n");
-    for (size_t i = 0; i < N_HIDDEN_LAYER+1; i++)
+    size_t n_params = ((N_HIDDEN_LAYER)+1) + network->weights_network->size + network->activation_network->size;
+    printf("Number of parameters: %zu\n", n_params);
+    printf("\n");
+    printf("|\tINPUT SIZE:\t%d\t|\n", INPUT_SIZE);
+    printf("|\tHIDDEN LAYERS:\t%d\t|\n",N_HIDDEN_LAYER);
+    printf("|\tHIDDEN SIZE:\t%d\t|\n", HIDDEN_SIZE);
+    printf("|\tOUTPUT SIZE:\t%d\t|\n", OUTPUT_SIZE);
+    printf("\n");
+
+    if (verbose)
     {
-        printf("%f ", network->bias[i]);
+        printf("Bias:\n");
+        for (size_t i = 0; i < N_HIDDEN_LAYER+1; i++)
+        {
+            printf("%f ", network->bias[i]);
+        }
+        printf("\nActivation network:\n");
+        display_matrix(network->activation_network);
+        
+        printf("\nWeights network:\n");
+        display_matrix(network->weights_network);
     }
-    printf("\nActivation network:\n");
-    display_matrix(network->activation_network);
-    
-    printf("\nWeights network:\n");
-    display_matrix(network->weights_network);
 }
 
 void init_weights(network_t* network)
@@ -107,7 +119,7 @@ void feed_forward(network_t* network)
 
             double activation = 0.f;            
 
-            // ITERATE OVER PREVIOUS LAYER WEIGHTS (Eureka, nigga)
+            // ITERATE OVER PREVIOUS LAYER WEIGHTS
             for (size_t z = 0; z < previous_layer_size; z++)
             {
                 double x = get_at(network->activation_network, z, (n-1));
