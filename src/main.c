@@ -7,6 +7,7 @@
 
 int main()
 {
+	// Static seed, easier for testing
 	srand(0);
 
 	network_t* network = init_network();
