@@ -23,7 +23,7 @@ network_t* init_network()
     fill_matrix(network->bias, -1.f);
 
     init_weights(network);
-    init_bias(network, 1);
+    init_bias(network, 5);
 
     return network;
 }
@@ -38,19 +38,19 @@ void free_network(network_t* network)
 
 void summary(network_t* network, int verbose)
 {
-    // A REVOIR!
-    size_t n_params = (INPUT_SIZE) * (HIDDEN_SIZE) + (HIDDEN_SIZE) *(HIDDEN_SIZE) * (N_HIDDEN_LAYER) + (HIDDEN_SIZE) * (OUTPUT_SIZE) + (OUTPUT_SIZE);
-    //size_t n_params = network_size(network);
-    printf("Number of parameters: %zu\n", n_params);
     printf("\n");
     printf("|\tINPUT SIZE:\t%d\t|\n", INPUT_SIZE);
-    printf("|\tHIDDEN LAYERS:\t%d\t|\n",N_HIDDEN_LAYER);
-    printf("|\tHIDDEN SIZE:\t%d\t|\n", HIDDEN_SIZE);
+    printf("|\tHIDDEN SIZE:\t%d @ %d\t|\n", HIDDEN_SIZE, N_HIDDEN_LAYER);
     printf("|\tOUTPUT SIZE:\t%d\t|\n", OUTPUT_SIZE);
     printf("\n");
 
     if (verbose)
     {
+        // A REVOIR!
+        size_t n_params = (INPUT_SIZE) * (HIDDEN_SIZE) + (HIDDEN_SIZE) *(HIDDEN_SIZE) * (N_HIDDEN_LAYER) + (HIDDEN_SIZE) * (OUTPUT_SIZE) + (OUTPUT_SIZE);
+        //size_t n_params = network_size(network);
+        printf("Number of parameters: %zu\n", n_params);
+
         printf("Bias:\n");
         display_matrix(network->bias);
         
@@ -142,7 +142,10 @@ void feed_forward(network_t* network)
             // ITERATE OVER PREVIOUS LAYER WEIGHTS
             for (size_t z = 0; z < previous_layer_size; z++)
             {
+                // previous activation
                 double x = get_at(network->activation_network, z, (n-1));
+
+                // weight
                 double w = get_at(network->weights_network, z + i * previous_layer_size, (n-1));
 
                 activation += x*w;
@@ -155,23 +158,62 @@ void feed_forward(network_t* network)
     }
 }
 
-// Fug
-void back_propagation(network_t* network)
+// (TYB3B1B) Thank you, based 3blue1brown 
+void back_propagation(network_t* network, double* y)
 {
+    double cost = cost_function(network, y);
+
+    // Step 1.
+    // - Start from output
+
+    for (size_t n = (N_HIDDEN_LAYER) + 1; n > 1 ; n--)
+    {
+        size_t current_layer_size = (HIDDEN_SIZE);
+
+        if (n == (N_HIDDEN_LAYER) + 1)
+            current_layer_size = (OUTPUT_SIZE);
+
+        for (size_t i = 0; i < current_layer_size; i++)
+        {
+
+        }
+    }
+    
+    // Step 2.
+    // - Select desired output neuron
+    // - Adjust previous layer weights & activations
+    //   in order to get the best activation for the desired output neuron
+    //   and STORE them somewhere
+    // - Repeat above while propagating backwards
+    //   towards the 1st hidden layer
+    
+    // Step 3.
+    // - Go back to output layer, select next neuron
+    // - Repeat Step 2. for this neuron
+    // - Sum together all the outputs from the backpropagation
+    // - Apply adjustments to weights
 
 }
 
+double gradient_descent(network_t* network)
+{
+    return 0.0f;
+}
+
+// Standard MSE
 double cost_function(network_t* network, double* y)
 {
-    double mse = 0;
+    // ~= 1, bad
+    // ~= 0, good
+    double cost = 0;
     
     for (size_t i = 0; i < OUTPUT_SIZE; i++)
     {
         double y_pred = get_at(network->activation_network, i, N_HIDDEN_LAYER + 1);
-        mse += (y[i] - y_pred) * (y[i] - y_pred);
+        cost += (y[i] - y_pred) * (y[i] - y_pred);
     }
 
-    mse /= OUTPUT_SIZE;
+    cost /= OUTPUT_SIZE;
 
-    return mse;
+    return cost;
 }

@@ -2,8 +2,10 @@
 #define NETWORK_H
 
 #define INPUT_SIZE 2
-#define HIDDEN_SIZE 3
-#define OUTPUT_SIZE 2
+#define HIDDEN_SIZE 2
+#define OUTPUT_SIZE 1
+
+#define MAT_SIZE (INPUT_SIZE) > (HIDDEN_SIZE) ? (INPUT_SIZE) : (HIDDEN_SIZE)
 
 #define N_HIDDEN_LAYER 1
 
@@ -29,8 +31,9 @@ void init_input(network_t* network, double* input);
 void feed_forward(network_t* network);
 
 // TODO: IMPLEMENT THESE!
-void back_propagation(network_t* network_t);
-double cost_function(network_t* network_t, double* y);
-
+void back_propagation(network_t* network, double* y);
+double gradient_descent(network_t* network);
+double cost_function(network_t* network, double* y);
+void train(network_t* network, size_t epochs);
 
 #endif // NETWORK_H

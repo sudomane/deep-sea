@@ -55,7 +55,6 @@ void fill_matrix(matrix_2D_t* mat, double val)
 
 void display_matrix(matrix_2D_t* mat)
 {
-    printf("Matrix shape (%zu, %zu)\n", mat->row, mat->col);
     for (size_t i = 0; i < mat->row; i++)
     {
         for (size_t j = 0; j < mat->col; j++)
