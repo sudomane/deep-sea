@@ -1,9 +1,9 @@
 #ifndef NETWORK_H
 #define NETWORK_H
 
-#define INPUT_SIZE 1
-#define HIDDEN_SIZE 2
-#define OUTPUT_SIZE 1
+#define INPUT_SIZE 2
+#define HIDDEN_SIZE 3
+#define OUTPUT_SIZE 2
 
 #define N_HIDDEN_LAYER 1
 

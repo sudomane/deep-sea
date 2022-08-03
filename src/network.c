@@ -23,7 +23,7 @@ network_t* init_network()
     fill_matrix(network->bias, -1.f);
 
     init_weights(network);
-    init_bias(network, 3);
+    init_bias(network, 1);
 
     return network;
 }
@@ -38,14 +38,15 @@ void free_network(network_t* network)
 
 void summary(network_t* network, int verbose)
 {
-    size_t n_params = network_size(network);
+    // A REVOIR!
+    size_t n_params = (INPUT_SIZE) * (HIDDEN_SIZE) + (HIDDEN_SIZE) *(HIDDEN_SIZE) * (N_HIDDEN_LAYER) + (HIDDEN_SIZE) * (OUTPUT_SIZE) + (OUTPUT_SIZE);
+    //size_t n_params = network_size(network);
     printf("Number of parameters: %zu\n", n_params);
     printf("\n");
     printf("|\tINPUT SIZE:\t%d\t|\n", INPUT_SIZE);
     printf("|\tHIDDEN LAYERS:\t%d\t|\n",N_HIDDEN_LAYER);
     printf("|\tHIDDEN SIZE:\t%d\t|\n", HIDDEN_SIZE);
     printf("|\tOUTPUT SIZE:\t%d\t|\n", OUTPUT_SIZE);
-    //printf("Last neuron value: %f\n", get_at(network->activation_network, OUTPUT_SIZE - 1, N_HIDDEN_LAYER + 1));
     printf("\n");
 
     if (verbose)
@@ -154,6 +155,7 @@ void feed_forward(network_t* network)
     }
 }
 
+// Fug
 void back_propagation(network_t* network)
 {
 
@@ -165,7 +167,7 @@ double cost_function(network_t* network, double* y)
     
     for (size_t i = 0; i < OUTPUT_SIZE; i++)
     {
-        double y_pred = get_at(network->activation_network, i, HIDDEN_SIZE + 1);
+        double y_pred = get_at(network->activation_network, i, N_HIDDEN_LAYER + 1);
         mse += (y[i] - y_pred) * (y[i] - y_pred);
     }
 
