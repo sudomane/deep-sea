@@ -30,7 +30,7 @@ void feed_forward(network_t* network);
 
 // TODO: IMPLEMENT THESE!
 void back_propagation(network_t* network_t);
-void cost_function(network_t* network_t);
+double cost_function(network_t* network_t, double* y);
 
 
 #endif // NETWORK_H

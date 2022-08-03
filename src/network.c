@@ -153,3 +153,23 @@ void feed_forward(network_t* network)
         }
     }
 }
+
+void back_propagation(network_t* network)
+{
+
+}
+
+double cost_function(network_t* network, double* y)
+{
+    double mse = 0;
+    
+    for (size_t i = 0; i < OUTPUT_SIZE; i++)
+    {
+        double y_pred = get_at(network->activation_network, i, HIDDEN_SIZE + 1);
+        mse += (y[i] - y_pred) * (y[i] - y_pred);
+    }
+
+    mse /= OUTPUT_SIZE;
+
+    return mse;
+}
