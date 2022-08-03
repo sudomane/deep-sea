@@ -87,3 +87,17 @@ void set_at(matrix_2D_t* self, int i, int j, double val)
 
     self->array[self->row * j + i] = val;
 }
+
+size_t matrix_size(matrix_2D_t* mat)
+{
+    size_t size = 0;
+
+    for (size_t i = 0; i < mat->size; i++)
+    {
+        if (mat->array[i] == -1)
+            continue;
+        size++;
+    }
+
+    return size;
+}

@@ -23,7 +23,7 @@ network_t* init_network()
     fill_matrix(network->bias, -1.f);
 
     init_weights(network);
-    init_bias(network);
+    init_bias(network, 3);
 
     return network;
 }
@@ -38,14 +38,14 @@ void free_network(network_t* network)
 
 void summary(network_t* network, int verbose)
 {
-    size_t n_params = network->bias->size + network->weights_network->size + network->activation_network->size;
+    size_t n_params = network_size(network);
     printf("Number of parameters: %zu\n", n_params);
     printf("\n");
     printf("|\tINPUT SIZE:\t%d\t|\n", INPUT_SIZE);
     printf("|\tHIDDEN LAYERS:\t%d\t|\n",N_HIDDEN_LAYER);
     printf("|\tHIDDEN SIZE:\t%d\t|\n", HIDDEN_SIZE);
     printf("|\tOUTPUT SIZE:\t%d\t|\n", OUTPUT_SIZE);
-    printf("Last neuron value: %f\n", get_at(network->activation_network, OUTPUT_SIZE - 1, N_HIDDEN_LAYER + 1));
+    //printf("Last neuron value: %f\n", get_at(network->activation_network, OUTPUT_SIZE - 1, N_HIDDEN_LAYER + 1));
     printf("\n");
 
     if (verbose)
@@ -59,6 +59,15 @@ void summary(network_t* network, int verbose)
         printf("\nWeights network:\n");
         display_matrix(network->weights_network);
     }
+}
+
+size_t network_size(network_t* network)
+{
+    size_t size = 0;
+    size += matrix_size(network->activation_network);
+    size += matrix_size(network->weights_network);
+    size += matrix_size(network->bias);
+    return size;
 }
 
 void init_weights(network_t* network)
@@ -85,19 +94,19 @@ void init_weights(network_t* network)
     }
 }
 
-void init_bias(network_t* network)
+void init_bias(network_t* network, size_t coef)
 {
     for (size_t i = 0; i < (HIDDEN_SIZE); i++)
     {
         for (size_t j = 0; j < (N_HIDDEN_LAYER); j++)
         {
-            set_at(network->bias, i, j, normalized_rand());
+            set_at(network->bias, i, j, normalized_rand() * coef);
         }
     }
     
     for (size_t i = 0; i < (OUTPUT_SIZE); i++)
     {
-        set_at(network->bias, i, N_HIDDEN_LAYER, normalized_rand());
+        set_at(network->bias, i, N_HIDDEN_LAYER, normalized_rand() * coef);
     }
 }
 
@@ -139,7 +148,6 @@ void feed_forward(network_t* network)
             }
         
             double bias = get_at(network->bias, i, n-1);
-            printf("BIAS GOTTEN: %f\n", bias);
             activation = sigmoid(activation - bias);
             set_at(network->activation_network, i, n, activation);
         }
