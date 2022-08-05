@@ -5,24 +5,27 @@
 #include "network.h"
 #include "utils.h"
 
-int main()
+void start()
 {
 	// Static seed, easier for testing
 	srand(0);
-
-	network_t* network = init_network();
+	system("clear");
 	
-	double X[INPUT_SIZE] = { 1.0f, 0.0f };
-	init_input(network, X);
-	summary(network, 0);
+	double X[INPUT_SIZE] = { 0.0f, 0.0f };
+	double y[OUTPUT_SIZE] = { 0.0f };
 
-	feed_forward(network);
-	summary(network, 1);
-	
-	double y[1] = { 1.0f };
-	double mse = cost_function(network, y);
-	printf("MSE: %f\n", mse);
+	// Initialize network with activation function
+	network_t* network = init_network(X, sigmoid, 0.1f);
+
+	train(network, y, 1000);
+	predict(network, X);
+
 	free_network(network);
+}
+
+int main(int argc, char* argv[])
+{
+	start();
 
 	return 0;
 }
