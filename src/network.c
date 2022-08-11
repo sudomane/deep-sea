@@ -82,23 +82,23 @@ void _net_feed_forward(network_t* net)
 {
     m_mul(net->X, net->w[0], net->z[0]);
     m_add(net->z[0], net->b[0], net->z[0]);
-    m_apply_dst(net->z[0], sigmoid, net->a[0]);
+    m_apply_dst(net->z[0], relu, net->a[0]);
 
     for (size_t l = 1; l < net->L; l++)
     {
         m_mul(net->a[l-1], net->w[l], net->z[l]);
         m_add(net->z[l], net->b[l], net->z[l]);
-        if (l != net->L-1)
-            m_apply_dst(net->z[l], sigmoid, net->a[l]);
-        else
+        if (l < net->L-1)
             m_apply_dst(net->z[l], relu, net->a[l]);
+        else
+            m_apply_dst(net->z[l], sigmoid, net->a[l]);
     }
 }
 
 void _net_backprop(network_t* net)
 {
     m_sub(net->a[net->L-1], net->y, net->delta[net->L-1]);
-    matrix_t* d_zL = m_apply(net->z[net->L-1], d_relu);
+    matrix_t* d_zL = m_apply(net->z[net->L-1], d_sigmoid);
     m_hadamard(net->delta[net->L-1], d_zL, net->delta[net->L-1]);
     m_free(d_zL);
 
@@ -107,7 +107,7 @@ void _net_backprop(network_t* net)
         matrix_t* weights_trans = m_transpose(net->w[l+1]);
         m_mul(net->delta[l+1], weights_trans, net->delta[l]);
 
-        matrix_t* d_zl = m_apply(net->z[l], d_sigmoid);
+        matrix_t* d_zl = m_apply(net->z[l], d_relu);
         m_hadamard(net->delta[l], d_zl, net->delta[l]);
 
         m_free(d_zl);
@@ -117,7 +117,7 @@ void _net_backprop(network_t* net)
 
 void _net_update_weights(network_t* net)
 {
-    double lr = 0.01;
+    double lr = 1;
 
     for (size_t l = net->L - 1; l > 0; l--)
     {
@@ -126,8 +126,8 @@ void _net_update_weights(network_t* net)
         matrix_t* a_trans = m_transpose(net->a[l-1]);
         matrix_t* w_copy = m_copy(net->w[l]);
         
-        m_mul(a_trans, net->delta[l], net->w[l]);
         m_scalar_mul(net->w[l], lr, net->w[l]);
+        m_mul(a_trans, net->delta[l], net->w[l]);
         m_sub(w_copy, net->w[l], net->w[l]);
 
         m_free(a_trans);
@@ -213,6 +213,7 @@ void net_display(network_t* net)
 
 void net_train(network_t* net, size_t epochs)
 {
+    // Testing training with single input XOR network
     double X_train[4][2] = {
 		{0.f, 0.f},
 		{0.f, 1.f},
@@ -227,6 +228,8 @@ void net_train(network_t* net, size_t epochs)
 		{0.f}
 	};
 
+    size_t index = 0;
+
     for (size_t i = 0; i < epochs; i++)
     {
         //printf("Epoch: [%zu / %zu]\n", i+1, epochs);
@@ -234,8 +237,8 @@ void net_train(network_t* net, size_t epochs)
         size_t X_rand = rand() % 4;
         size_t y_rand = rand() % 4;
 
-        double* X = X_train[1];
-        double* y = y_train[1];
+        double* X = X_train[index];
+        double* y = y_train[index];
 
         net_init_X(net, X);
         net_init_y(net, y);
@@ -247,4 +250,7 @@ void net_train(network_t* net, size_t epochs)
     }
 
     printf("Completed %zu epochs!\n", epochs);
+
+    printf("\nInput: %f, %f\n\n", X_train[index][0], X_train[index][1]);
+    printf("Prediction:\t%f\nExpected\t%f\n", net->a[net->L-1]->array[0], y_train[index][0]);
 }

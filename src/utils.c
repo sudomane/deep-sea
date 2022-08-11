@@ -15,7 +15,7 @@ double sigmoid(double x)
 
 double d_sigmoid(double x)
 {
-    return x * (1.f - x);
+    return sigmoid(x) * (1.f - sigmoid(x));
 }
 
 double relu(double x)

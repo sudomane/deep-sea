@@ -53,8 +53,9 @@ void m_display(matrix_t* m)
 matrix_t* m_copy(matrix_t* m)
 {
     matrix_t* m_ = m_init(m->n_row, m->n_col);
-
-    memcpy(m_->array, m->array, m->size);
+    
+    for (size_t i = 0; i < m->size; i++)
+        m_->array[i] = m->array[i];
 
     return m_;
 }
