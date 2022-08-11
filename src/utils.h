@@ -1,7 +1,9 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-double normalized_rand();
+/* Neural network internal API */
+
+double normalized_rand(void);
 double sigmoid(double x);
 double d_sigmoid(double x);
 double relu(double x);

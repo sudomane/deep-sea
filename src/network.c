@@ -7,244 +7,244 @@
 
 #include "utils.h"
 
-network_t* init_network(double* X, double (*activation_function) (double), double lr)
+/* NETWORK INTERNAL API */
+
+static void _net_alloc_layers(network_t* net)
 {
-    network_t* network = calloc(1, sizeof(network_t));
+    net->X = m_init(1, net->input_size);
+    net->y = m_init(1, net->output_size);
 
-    if (network == NULL)
-        errx(-1, "Could not allocate enough memory to create network!");
+    net->a = calloc(net->L, sizeof(matrix_t*));
+    net->z = calloc(net->L, sizeof(matrix_t*));
+    net->w = calloc(net->L, sizeof(matrix_t*));
+    net->b = calloc(net->L, sizeof(matrix_t*));
+    net->delta = calloc(net->L, sizeof(matrix_t*));
 
-    network->activation_function = activation_function;
-    network->activation = init_matrix((HIDDEN_SIZE), (N_HIDDEN_LAYER) + 2);
-    network->weights = init_matrix((HIDDEN_SIZE) * (HIDDEN_SIZE), (N_HIDDEN_LAYER) + 1);
-    network->bias = init_matrix((HIDDEN_SIZE), (N_HIDDEN_LAYER) + 1);
-    network->learning_rate = lr;
+    // Input layer
+    net->a[0] = m_init(1, net->hidden_size);
+    net->z[0] = m_init(1, net->hidden_size);
+    net->b[0] = m_init(1, net->hidden_size);
+    net->delta[0] = m_init(1, net->hidden_size);
 
-    fill_matrix(network->activation, -1.f);
-    fill_matrix(network->weights, -1.f);
-    fill_matrix(network->bias, -1.f);
+    net->w[0] = m_init(net->input_size, net->hidden_size);
+
+    // Hidden layers
+    for (size_t l = 1; l < net->L - 1; l++)
+    {
+        net->a[l] = m_init(1, net->hidden_size);
+        net->z[l] = m_init(1, net->hidden_size);
+        net->b[l] = m_init(1, net->hidden_size);
+        net->delta[l] = m_init(1, net->hidden_size);
+
+        net->w[l] = m_init(net->hidden_size, net->hidden_size);
+    }
+
+    // Output layer
+    net->a[net->L - 1] = m_init(1, net->output_size);
+    net->z[net->L - 1] = m_init(1, net->output_size);
+    net->b[net->L - 1] = m_init(1, net->output_size);
+    net->delta[net->L - 1] = m_init(1, net->output_size);
+
+    net->w[net->L - 1] = m_init(net->hidden_size, net->output_size);
+}
+
+static void _net_free_layers(network_t* net)
+{
+    m_free(net->X);
+    m_free(net->y);
     
-    init_input(network, X);
-    init_weights(network);
-    init_bias(network, 1);
-
-    return network;
-}
-
-void free_network(network_t* network)
-{
-    free_matrix(network->activation);
-    free_matrix(network->weights);
-    free_matrix(network->bias);
-    free(network);
-}
-
-void summary(network_t* network, int verbose)
-{
-    printf("\n");
-    printf("|\tINPUT SIZE:\t%d\t|\n", (INPUT_SIZE));
-    printf("|\tHIDDEN SIZE:\t%d @ %d\t|\n", (HIDDEN_SIZE), (N_HIDDEN_LAYER));
-    printf("|\tOUTPUT SIZE:\t%d\t|\n", (OUTPUT_SIZE));
-    printf("\n");
-
-    if (verbose)
+    for (size_t l = 0; l < net->L; l++)
     {
-        size_t n_params = matrix_size(network->activation)
-                        + matrix_size(network->bias)
-                        + matrix_size(network->weights)
-                        - (INPUT_SIZE);
-        printf("Number of parameters: %zu\n", n_params);
-
-        printf("Bias:\n");
-        display_matrix(network->bias);
-        
-        printf("\nActivation network:\n");
-        display_matrix(network->activation);
-        
-        printf("\nWeights network:\n");
-        display_matrix(network->weights);
-    }
-}
-
-void init_weights(network_t* network)
-{
-    // INPUT to 1st HIDDEN LAYER
-    for (size_t i = 0; i < (INPUT_SIZE) * (HIDDEN_SIZE); i++)
-    {
-        set_at(network->weights, i, 0, normalized_rand());
-    }
-
-    // 1st HIDDEN LAYER to Nth HIDDEN LAYER
-    for (size_t i = 0; i < (HIDDEN_SIZE) * (HIDDEN_SIZE); i++)
-    {
-        for (size_t j = 1; j < (N_HIDDEN_LAYER); j++)
-        {
-            set_at(network->weights, i, j, normalized_rand());
-        }
-    }
-
-    // Nth HIDDEN LAYER to OUTPUT LAYER
-    for (size_t i = 0; i < (HIDDEN_SIZE) * (OUTPUT_SIZE); i++)
-    {
-        set_at(network->weights, i, (N_HIDDEN_LAYER), normalized_rand());
-    }
-}
-
-void init_bias(network_t* network, size_t coef)
-{
-    for (size_t i = 0; i < (HIDDEN_SIZE); i++)
-    {
-        for (size_t j = 0; j < (N_HIDDEN_LAYER); j++)
-        {
-            set_at(network->bias, i, j, normalized_rand() * coef);
-        }
+        m_free(net->a[l]);
+        m_free(net->z[l]);
+        m_free(net->b[l]);
+        m_free(net->delta[l]);
+        m_free(net->w[l]);
     }
     
-    for (size_t i = 0; i < (OUTPUT_SIZE); i++)
+    free(net->a);
+    free(net->z);
+    free(net->w);
+    free(net->b);
+    free(net->delta);
+}
+
+void _net_init_layers(network_t* net)
+{
+    for (size_t l = 0; l < net->L; l++)
     {
-        set_at(network->bias, i, (N_HIDDEN_LAYER), normalized_rand() * coef);
+        m_fill(net->w[l], normalized_rand);
+        m_fill(net->b[l], normalized_rand);
     }
 }
 
-void init_input(network_t* network, double* input)
+void _net_feed_forward(network_t* net)
 {
-    for (size_t i = 0; i < (INPUT_SIZE); i++)
+    m_mul(net->X, net->w[0], net->z[0]);
+    m_add(net->z[0], net->b[0], net->z[0]);
+    m_apply_dst(net->z[0], sigmoid, net->a[0]);
+
+    for (size_t l = 1; l < net->L; l++)
     {
-        network->activation[0].array[i] = input[i];
+        m_mul(net->a[l-1], net->w[l], net->z[l]);
+        m_add(net->z[l], net->b[l], net->z[l]);
+        if (l != net->L-1)
+            m_apply_dst(net->z[l], sigmoid, net->a[l]);
+        else
+            m_apply_dst(net->z[l], relu, net->a[l]);
     }
 }
 
-void feed_forward(network_t* network)
+void _net_backprop(network_t* net)
 {
-    // ITERATE OVER LAYERS
-    for (size_t l = 1; l <= (N_HIDDEN_LAYER) + 1; l++)
+    m_sub(net->a[net->L-1], net->y, net->delta[net->L-1]);
+    matrix_t* d_zL = m_apply(net->z[net->L-1], d_relu);
+    m_hadamard(net->delta[net->L-1], d_zL, net->delta[net->L-1]);
+    m_free(d_zL);
+
+    for (int l = net->L-2; l >= 0; l--)
     {
-        size_t current_layer_size = (HIDDEN_SIZE);
+        matrix_t* weights_trans = m_transpose(net->w[l+1]);
+        m_mul(net->delta[l+1], weights_trans, net->delta[l]);
+
+        matrix_t* d_zl = m_apply(net->z[l], d_sigmoid);
+        m_hadamard(net->delta[l], d_zl, net->delta[l]);
+
+        m_free(d_zl);
+        m_free(weights_trans);
+    }
+}
+
+void _net_update_weights(network_t* net)
+{
+    double lr = 0.01;
+
+    for (size_t l = net->L - 1; l > 0; l--)
+    {
+        //net->w[l] = net->w[l] - lr * net->delta[l] * net->a[l-1].T
+
+        matrix_t* a_trans = m_transpose(net->a[l-1]);
+        matrix_t* w_copy = m_copy(net->w[l]);
         
-        if (l == (N_HIDDEN_LAYER) + 1)
-            current_layer_size = (OUTPUT_SIZE);
+        m_mul(a_trans, net->delta[l], net->w[l]);
+        m_scalar_mul(net->w[l], lr, net->w[l]);
+        m_sub(w_copy, net->w[l], net->w[l]);
 
-        // ITERATE OVER LAYER NEURONS
-        for (size_t j = 0; j < current_layer_size; j++)
-        {
-            size_t previous_layer_size = (HIDDEN_SIZE);
-            
-            if ((l-1) == 0)
-                previous_layer_size = (INPUT_SIZE);
-
-            // z - Sum of all bias + weights
-            double z = 0.f;            
-
-            // ITERATE OVER PREVIOUS LAYER WEIGHTS
-            for (size_t k = 0; k < previous_layer_size; k++)
-            {
-                // previous activation
-                double x = get_at(network->activation, k, (l-1));
-
-                // weight
-                double w = get_at(network->weights, k + j * previous_layer_size, (l-1));
-
-                z += x*w;
-            }
-        
-            // b - Bias
-            double b = get_at(network->bias, j, l-1);
-
-            // a - Activation
-            double a = network->activation_function(z - b   );
-            set_at(network->activation, j, l, a);
-        }
+        m_free(a_trans);
+        m_free(w_copy);
     }
 }
 
-// Still broken
-void back_propagation(network_t* network, double* y)
+void _net_update_bias(network_t* net)
 {
-    double output_error[(OUTPUT_SIZE)] = { 0 };
-    size_t last_layer = (N_HIDDEN_LAYER);
-    
-    for (size_t j = 0; j < (OUTPUT_SIZE); j++)
+    double lr = 0.01;
+
+    for (size_t l = net->L - 1; l > 0; l--)
     {
-        for (size_t k = 0; k < (HIDDEN_SIZE); k++)
-        {
-            double w_o = get_at(network->weights, k + j * (HIDDEN_SIZE), last_layer);
-            output_error[j] += (w_o - y[j]) * d_sigmoid(w_o);
-        }
-    }
+        //net->b[l] = net->b[l] - lr * net->delta[l];
 
-    for (size_t j = 0; j < (OUTPUT_SIZE); j++)
-    {
-        for (size_t k = 0; k < (HIDDEN_SIZE); k++)
-        {
-            double w_o = get_at(network->weights, k + j * (HIDDEN_SIZE), last_layer);
-            double input_neuron = get_at(network->activation, j, last_layer - 1);
-            double new_weight = w_o - network->learning_rate * output_error[j] * input_neuron;
-            
-            set_at(network->weights, k + j * (HIDDEN_SIZE), last_layer, new_weight);
-        }
-    }
-
-    // Weight layer index
-    for (int l = (N_HIDDEN_LAYER); l > 0; l--)
-    {
-        size_t current_layer_size = (HIDDEN_SIZE);
-
-        double hidden_error[(HIDDEN_SIZE)];
-
-        size_t previous_layer_size = (HIDDEN_SIZE);
-        if (l-1 == 0)
-            previous_layer_size = (INPUT_SIZE);
-
-        for (size_t j = 0; j < current_layer_size; j++)
-        {         
-            for (size_t k = 0; k < previous_layer_size; k++)
-            {
-                double w_h = get_at(network->weights, k + j * previous_layer_size, l-1);
-                double current_y = get_at(network->activation, j, l);
-                hidden_error[j] += (w_h - current_y) * d_sigmoid(w_h);
-            }
-        }
-
-        for (size_t j = 0; j < current_layer_size; j++)
-        {
-            for (size_t k = 0; k < previous_layer_size; k++)
-            {
-                double w_h = get_at(network->weights, k + j * previous_layer_size, l-1);
-                double input_neuron = get_at(network->activation, j, l-1);
-                double new_weight = w_h - network->learning_rate * hidden_error[j] * input_neuron;
-                
-                set_at(network->weights, k + j * previous_layer_size, l-1, new_weight);
-            }
-        }
+        m_scalar_mul(net->delta[l], lr, net->delta[l]);
+        m_sub(net->b[l], net->delta[l], net->b[l]);
     }
 }
 
-void train(network_t* network, double* y, size_t epochs)
+/* NETWORK PUBLIC API */
+
+network_t* net_init(size_t input_size, size_t hidden_size, size_t output_size, size_t L)
 {
+    network_t* net = malloc(sizeof(network_t));
+
+    net->input_size = input_size;
+    net->hidden_size = hidden_size;
+    net->output_size = output_size;
+    net->L = L;
+
+    _net_alloc_layers(net);
+    _net_init_layers(net);
+
+    return net;
+}
+
+void net_free(network_t* net)
+{
+    _net_free_layers(net);
+    free(net);
+
+    net = NULL;
+}
+
+void net_init_X(network_t* net, double* X)
+{
+    for(size_t i = 0; i < net->input_size; i++)
+        net->X->array[i] = X[i];
+}    
+
+void net_init_y(network_t* net, double* y)
+{
+    for(size_t i = 0; i < net->output_size; i++)
+        net->y->array[i] = y[i];
+}
+
+void net_display(network_t* net)
+{
+    printf("Input layer:\n");
+    m_display(net->X);
+
+    printf("Z-Activation:\n");
+    for (size_t l = 0; l < net->L; l++)
+        m_display(net->z[l]);
+
+    printf("Activation:\n");
+    for (size_t l = 0; l < net->L; l++)
+        m_display(net->a[l]);
+
+    printf("Weights:\n");
+    for (size_t l = 0; l < net->L; l++)
+        m_display(net->w[l]);
+
+    printf("Bias:\n");
+    for (size_t l = 0; l < net->L; l++)
+        m_display(net->b[l]);
+
+    printf("Delta:\n");
+    for (size_t l = 0; l < net->L; l++)
+        m_display(net->delta[l]);
+}
+
+void net_train(network_t* net, size_t epochs)
+{
+    double X_train[4][2] = {
+		{0.f, 0.f},
+		{0.f, 1.f},
+		{1.f, 0.f},
+		{1.f, 1.f}
+	};
+
+	double y_train[4][1] = {
+		{0.f},
+		{1.f},
+		{1.f},
+		{0.f}
+	};
+
     for (size_t i = 0; i < epochs; i++)
     {
-        //printf("EPOCH: %zu / %zu\n", i + 1, epochs);
-        feed_forward(network);
-        back_propagation(network, y);
-    }
-}
+        //printf("Epoch: [%zu / %zu]\n", i+1, epochs);
 
-void predict(network_t* network, double* X)
-{
-    init_input(network, X);
-    feed_forward(network);
-    
-    printf("Input X:\n");
-    for (size_t i = 0; i < (INPUT_SIZE); i++)
-    {
-        printf("%f ", X[i]);
-    }
+        size_t X_rand = rand() % 4;
+        size_t y_rand = rand() % 4;
 
-    printf("\n\nPredicted Y:\n");
-    for (size_t i = 0; i < (OUTPUT_SIZE); i++)
-    {
-        printf("%f ", get_at(network->activation, i, (N_HIDDEN_LAYER)));
+        double* X = X_train[1];
+        double* y = y_train[1];
+
+        net_init_X(net, X);
+        net_init_y(net, y);
+
+        _net_feed_forward(net);
+        _net_backprop(net);
+        _net_update_weights(net);
+        _net_update_bias(net);
     }
 
-    printf("\n");
+    printf("Completed %zu epochs!\n", epochs);
 }

@@ -1,11 +1,11 @@
+#include "utils.h"
+
 #include <math.h>
 #include <stdlib.h>
 
-#include "utils.h"
-
-double normalized_rand()
+double normalized_rand(void)
 {
-    return (double) rand()/ (double) RAND_MAX;
+    return (double) rand() / (double) RAND_MAX;
 }
 
 double sigmoid(double x)

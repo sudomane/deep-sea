@@ -3,29 +3,24 @@
 #include <time.h>
 
 #include "network.h"
+#include "matrix.h"
 #include "utils.h"
 
-void start()
-{
-	// Static seed, easier for testing
-	srand(0);
-	system("clear");
-	
-	double X[INPUT_SIZE] = { 0.0f, 0.0f };
-	double y[OUTPUT_SIZE] = { 0.0f };
-
-	// Initialize network with activation function
-	network_t* network = init_network(X, sigmoid, 0.1f);
-
-	train(network, y, 1000);
-	predict(network, X);
-
-	free_network(network);
-}
-
 int main(int argc, char* argv[])
-{
-	start();
+{	
+	srand(time(NULL));
+
+	size_t L = 2;
+	size_t input_size = 2;
+	size_t hidden_size = 2;
+	size_t output_size = 1;
+	
+	network_t* net = net_init(input_size, hidden_size, output_size, L);
+	
+	net_train(net, 10000);
+	net_display(net);
+
+	net_free(net);
 
 	return 0;
 }

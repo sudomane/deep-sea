@@ -5,98 +5,173 @@
 #include <stdio.h>
 #include <string.h>
 
-// row = i
-// col = j
-matrix_2D_t* init_matrix(size_t row, size_t col)
+matrix_t* m_init(size_t n_row, size_t n_col)
 {
-    matrix_2D_t* mat = malloc(sizeof(matrix_2D_t));
+    matrix_t* m = malloc(sizeof(matrix_t));
 
-    if (mat == NULL)
+    if (m == NULL)
     {
         errx(-1, "Not enough memory to initialize matrix!\n");
     }
 
-    mat->array = calloc(row * col, sizeof(double));
+    m->array = calloc(n_row * n_col, sizeof(double));
 
-    if (mat->array == NULL)
+    if (m->array == NULL)
     {
         errx(-1, "Not enough memory to initialize matrix array!\n");
     }
 
-    mat->row = row;
-    mat->col = col;
-    mat->size = row * col;
+    m->n_row = n_row;
+    m->n_col = n_col;
+    m->size = n_row * n_col;
 
-    return mat;
+    return m;
 }
 
-void free_matrix(matrix_2D_t* mat)
+void m_free(matrix_t* m)
 {   
-    free(mat->array);
-    free(mat);
+    free(m->array);
+    free(m);
 }
 
-void reset_matrix(matrix_2D_t* mat)
+void m_display(matrix_t* m)
 {
-    // TODO: Fix!
-    //memset(mat->array, 0, mat->size);
-    for (size_t i = 0; i < mat->size; i++)
-        mat->array[i] = 0;
-}
-
-void fill_matrix(matrix_2D_t* mat, double val)
-{
-    // TODO: Fix!
-    //memset(mat->array, val, mat->size * sizeof(double));
-    for (size_t i = 0; i < mat->size; i++)
-        mat->array[i] = val;
-
-}
-
-void display_matrix(matrix_2D_t* mat)
-{
-    for (size_t i = 0; i < mat->row; i++)
+    printf("\t(%zu, %zu):\n", m->n_row, m->n_col);
+    for (size_t i = 0; i < m->n_row; i++)
     {
-        for (size_t j = 0; j < mat->col; j++)
+        printf("\t\t");
+        for (size_t j = 0; j < m->n_col; j++)
         {
-            double val = get_at(mat, i, j);
-
-            if (val == -1)
-                printf("\t ");
-            else
-                printf("%f ", get_at(mat, i, j));
+            double val = m_get(m, i, j);
+            printf("%f ", val);
         }
 
         printf("\n");
     }
 }
 
-double get_at(matrix_2D_t* self, int i, int j)
+matrix_t* m_copy(matrix_t* m)
 {
-    if (i >= self->row || j >= self->col || i < 0 || j < 0)
-        errx(-1, "Cannot get here, out of matrix bounds!\n");
+    matrix_t* m_ = m_init(m->n_row, m->n_col);
 
-    return self->array[self->row * j + i];
+    memcpy(m_->array, m->array, m->size);
+
+    return m_;
 }
 
-void set_at(matrix_2D_t* self, int i, int j, double val)
+void m_fill(matrix_t* m, double (*fun)(void))
 {
-    if (i >= self->row || j >= self->col || i < 0 || j < 0)
-        errx(-1, "Cannot set here, out of matrix bounds!\n");
-
-    self->array[self->row * j + i] = val;
+    for (size_t i = 0; i < m->size; i++)
+        m->array[i] = fun();
 }
 
-size_t matrix_size(matrix_2D_t* mat)
+double m_get(matrix_t* m, size_t row, size_t col)
 {
-    size_t size = 0;
+    if (row >= m->n_row || col >= m->n_col)
+        errx(-1, "Cannot get here, out of matrix bounds!");
 
-    for (size_t i = 0; i < mat->size; i++)
+    return m->array[m->n_row * col + row];
+}
+
+void m_set(matrix_t* m, size_t row, size_t col, double val)
+{
+    if (row >= m->n_row || col >= m->n_col)
+        errx(-1, "Cannot set here, out of matrix bounds!");
+
+    m->array[m->n_row * col + row] = val;
+}
+
+void m_mul(matrix_t* m1, matrix_t* m2, matrix_t* dst)
+{
+    if (m1->n_col != m2->n_row)
+        errx(-1, "Cannot multiply matrix (%zu, %zu) with matrix (%zu, %zu).", m1->n_row, m1->n_col, m2->n_row, m2->n_col);
+
+    for (size_t i = 0; i < m1->n_row; i++)
     {
-        if (mat->array[i] == -1)
-            continue;
-        size++;
+        for (size_t j = 0; j < m2->n_col; j++)
+        {
+            double val = 0.f;
+            
+            for (size_t k = 0; k < m1->n_col; k++)
+            {
+                double m1_val = m_get(m1, i, k);
+                double m2_val = m_get(m2, k, j);
+                val += m1_val * m2_val;
+            }
+
+            m_set(dst, i, j, val);
+        }
+    }
+}
+
+void m_add(matrix_t* m1, matrix_t* m2, matrix_t* dst)
+{
+    if (m1->n_col != m2->n_col || m1->n_row != m2->n_row)
+        errx(-1, "Cannot add matrix (%zu, %zu) with matrix (%zu, %zu).", m1->n_row, m1->n_col, m2->n_row, m2->n_col);
+
+    for (size_t i = 0; i < m1->size; i++)
+        dst->array[i] = m1->array[i] + m2->array[i];
+}
+
+void m_sub(matrix_t* m1, matrix_t* m2, matrix_t* dst)
+{
+    if (m1->n_col != m2->n_col || m1->n_row != m2->n_row)
+        errx(-1, "Cannot substract matrix (%zu, %zu) with matrix (%zu, %zu).", m1->n_row, m1->n_col, m2->n_row, m2->n_col);
+
+    for (size_t i = 0; i < m1->size; i++)
+        dst->array[i] = m1->array[i] - m2->array[i];
+}
+
+void m_scalar_mul(matrix_t* m, double lambda, matrix_t* dst)
+{
+    for (size_t i = 0; i < m->size; i++)
+        dst->array[i] = m->array[i] * lambda;
+}
+
+void m_scalar_add(matrix_t* m, double lambda, matrix_t* dst)
+{
+    for (size_t i = 0; i < m->size; i++)
+        dst->array[i] = m->array[i] + lambda;
+}
+
+void m_hadamard(matrix_t* m1, matrix_t* m2, matrix_t* dst)
+{
+    if (m1->n_col != m2->n_col || m1->n_row != m2->n_row)
+        errx(-1, "Cannot apply hadamard product on matrix (%zu, %zu) with matrix (%zu, %zu).", m1->n_row, m1->n_col, m2->n_row, m2->n_col);
+
+    for (size_t i = 0; i < m1->size; i++)
+        dst->array[i] = m1->array[i] * m2->array[i];
+}
+
+matrix_t* m_transpose(matrix_t* m)
+{
+    matrix_t* m_t = m_init(m->n_col, m->n_row);
+
+    for (size_t i = 0; i < m->n_row; i++)
+    {
+        for (size_t j = 0; j < m->n_col; j++)
+        {
+            double val = m_get(m, i, j);
+            m_set(m_t, j, i, val);
+        }
     }
 
-    return size;
+    return m_t;
+}
+
+void m_apply_dst(matrix_t* m, double (*fun)(double), matrix_t* dst)
+{
+    for (size_t i = 0; i < m->size; i++)
+        dst->array[i] = fun(m->array[i]);
+}
+
+// FREE MATRIX AFTER!
+matrix_t* m_apply(matrix_t* m, double (*fun)(double))
+{
+    matrix_t* dst = m_init(m->n_row, m->n_col);
+    
+    for (size_t i = 0; i < m->size; i++)
+        dst->array[i] = fun(m->array[i]);
+
+    return dst;
 }

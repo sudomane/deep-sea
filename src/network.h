@@ -1,38 +1,40 @@
+/*
+** Matrix-implementation of the multi-layer perceptron network,
+** (fully connected network).
+*/
+
 #ifndef NETWORK_H
 #define NETWORK_H
 
-#define INPUT_SIZE 2
-#define HIDDEN_SIZE 2
-#define OUTPUT_SIZE 1
-
-#define MAT_SIZE (INPUT_SIZE) > (HIDDEN_SIZE) ? (INPUT_SIZE) : (HIDDEN_SIZE)
-
-#define N_HIDDEN_LAYER 1
+/* Neural network public API */
 
 #include "matrix.h"
 
 typedef struct
 {
-    matrix_2D_t* activation; // Matrix containing activation values (input + hidden + output)
-    matrix_2D_t* weights; // Matrix containing weights for each layer (hidden + output)
-    matrix_2D_t* bias; // Matrix containing biases for each layer's neurons (hidden + output)
+    // Number of hidden layers + output layer
+    size_t L;
+    size_t input_size;
+    size_t hidden_size;
+    size_t output_size;
 
-    double (* activation_function) (double);
-    double learning_rate;
+    matrix_t* X;
+    matrix_t* y;
+    
+    matrix_t** a;
+    matrix_t** z;
+    matrix_t** w;
+    matrix_t** b;
+    matrix_t** delta;
 } network_t;
 
-network_t* init_network(double* X, double (* activation_function) (double), double lr);
-void free_network(network_t* network);
-void summary(network_t* network, int verbose);
+network_t* net_init(size_t input_size, size_t hidden_size, size_t output_size, size_t L);
+void net_free(network_t* net);
 
-void init_weights(network_t* network);
-void init_bias(network_t* network, size_t coef);
-void init_input(network_t* network, double* input);
+void net_init_X(network_t* net, double* X);
+void net_init_y(network_t* net, double* y);
 
-void feed_forward(network_t* network);
-void back_propagation(network_t* network, double* y);
-
-void train(network_t* network, double* y, size_t epochs);
-void predict(network_t* network, double* X);
+void net_display(network_t* net);
+void net_train(network_t* net, size_t epochs);
 
 #endif // NETWORK_H
