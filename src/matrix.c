@@ -14,6 +14,13 @@
 #include <stdio.h>
 #include <string.h>
 
+/**
+ * @brief Initialize a matrix of n_row x n_col dimensions
+ * 
+ * @param n_row Number of rows
+ * @param n_col Number of columns
+ * @return matrix_t* Pointer to initialized matrix struct
+ */
 matrix_t* m_init(size_t n_row, size_t n_col)
 {
     matrix_t* m = malloc(sizeof(matrix_t));
@@ -35,12 +42,22 @@ matrix_t* m_init(size_t n_row, size_t n_col)
     return m;
 }
 
+/**
+ * @brief Frees the matrix
+ * 
+ * @param m Matrix struct
+ */
 void m_free(matrix_t* m)
 {   
     free(m->array);
     free(m);
 }
 
+/**
+ * @brief Displays the matrix
+ * 
+ * @param m Matrix struct
+ */
 void m_display(matrix_t* m)
 {
     printf("\t(%zu, %zu):\n", m->n_row, m->n_col);
@@ -57,6 +74,13 @@ void m_display(matrix_t* m)
     }
 }
 
+/**
+ * @brief Allocates a new matrix, and copies the content of
+ *        given matrix into the newly allocated one. 
+ * 
+ * @param m Matrix to copy
+ * @return matrix_t* Pointer to matrix copy
+ */
 matrix_t* m_copy(matrix_t* m)
 {
     matrix_t* m_ = m_init(m->n_row, m->n_col);
@@ -67,12 +91,26 @@ matrix_t* m_copy(matrix_t* m)
     return m_;
 }
 
+/**
+ * @brief Fills a matrix with a function's return value.
+ * 
+ * @param m Matrix to fill
+ * @param fun Function that returns double, and takes void arguments.
+ */
 void m_fill(matrix_t* m, double (*fun)(void))
 {
     for (size_t i = 0; i < m->size; i++)
         m->array[i] = fun();
 }
 
+/**
+ * @brief Gets element in matrix at (row, col)
+ * 
+ * @param m Matrix to get element from
+ * @param row Row of element
+ * @param col Column of element
+ * @return double Value of element
+ */
 double m_get(matrix_t* m, size_t row, size_t col)
 {
     if (row >= m->n_row || col >= m->n_col)
@@ -83,6 +121,14 @@ double m_get(matrix_t* m, size_t row, size_t col)
     return m->array[m->n_row * col + row];
 }
 
+/**
+ * @brief Sets element in matrix at (row, col) to val
+ * 
+ * @param m Matrix to set element in
+ * @param row Row of element
+ * @param col Column of element
+ * @param val Value of element
+ */
 void m_set(matrix_t* m, size_t row, size_t col, double val)
 {
     if (row >= m->n_row || col >= m->n_col)
@@ -93,6 +139,14 @@ void m_set(matrix_t* m, size_t row, size_t col, double val)
     m->array[m->n_row * col + row] = val;
 }
 
+/**
+ * @brief Matrix multiplication with m1 and m2,
+ *        stored in matrix dst
+ * 
+ * @param m1 Left hand operation matrix
+ * @param m2 Right hand operation matrix
+ * @param dst Destination matrix to store result in
+ */
 void m_mul(matrix_t* m1, matrix_t* m2, matrix_t* dst)
 {
     if (m1->n_col != m2->n_row)
@@ -123,6 +177,13 @@ void m_mul(matrix_t* m1, matrix_t* m2, matrix_t* dst)
     }
 }
 
+/**
+ * @brief Matrix addition with m1 and m2 in dst
+ * 
+ * @param m1 Left hand operation matrix
+ * @param m2 Right hand operation matrix
+ * @param dst Destination matrix to store result in
+ */
 void m_add(matrix_t* m1, matrix_t* m2, matrix_t* dst)
 {
     if (m1->n_col != m2->n_col || m1->n_row != m2->n_row)
@@ -139,6 +200,13 @@ void m_add(matrix_t* m1, matrix_t* m2, matrix_t* dst)
         dst->array[i] = m1->array[i] + m2->array[i];
 }
 
+/**
+ * @brief Matrix substraction with m1 and m2 in dst
+ * 
+ * @param m1 Left hand operation matrix
+ * @param m2 Right hand operation matrix
+ * @param dst Destination matrix to store result in
+ */
 void m_sub(matrix_t* m1, matrix_t* m2, matrix_t* dst)
 {
     if (m1->n_col != m2->n_col || m1->n_row != m2->n_row)
@@ -155,18 +223,40 @@ void m_sub(matrix_t* m1, matrix_t* m2, matrix_t* dst)
         dst->array[i] = m1->array[i] - m2->array[i];
 }
 
+/**
+ * @brief Matrix scalar multiplication with m and lambda
+ * 
+ * @param m Matrix to multiply lambda with
+ * @param lambda Constant value
+ * @param dst Destination matrix to store result in
+ */
 void m_scalar_mul(matrix_t* m, double lambda, matrix_t* dst)
 {
     for (size_t i = 0; i < m->size; i++)
         dst->array[i] = m->array[i] * lambda;
 }
 
+/**
+ * @brief Matrix scalar addition with m and lambda
+ * 
+ * @param m Matrix to add lambda to
+ * @param lambda Constant value
+ * @param dst Destination matrix to store result in
+ */
 void m_scalar_add(matrix_t* m, double lambda, matrix_t* dst)
 {
     for (size_t i = 0; i < m->size; i++)
         dst->array[i] = m->array[i] + lambda;
 }
 
+/**
+ * @brief Matrix hadamard product with m1 and m2
+ *        stored in matrix dst
+ * 
+ * @param m1 Left hand operation matrix
+ * @param m2 Right hand operation matrix
+ * @param dst Destination matrix to store result in
+ */
 void m_hadamard(matrix_t* m1, matrix_t* m2, matrix_t* dst)
 {
     if (m1->n_col != m2->n_col || m1->n_row != m2->n_row)
@@ -183,6 +273,12 @@ void m_hadamard(matrix_t* m1, matrix_t* m2, matrix_t* dst)
         dst->array[i] = m1->array[i] * m2->array[i];
 }
 
+/**
+ * @brief Returns the transpose of a matrix
+ * 
+ * @param m Matrix to transpose
+ * @return matrix_t* Newly allocated transpose matrix
+ */
 matrix_t* m_transpose(matrix_t* m)
 {
     matrix_t* m_t = m_init(m->n_col, m->n_row);
@@ -199,6 +295,14 @@ matrix_t* m_transpose(matrix_t* m)
     return m_t;
 }
 
+/**
+ * @brief Applies a function to a matrix, and stores the result
+ *        in the matrix dst
+ * 
+ * @param m Matrix to apply function to
+ * @param fun Function to apply to matrix: takes double, returns double
+ * @param dst Destination matrix to store result in
+ */
 void m_apply_dst(matrix_t* m, double (*fun)(double), matrix_t* dst)
 {
     if (m->n_row != dst->n_row || m->n_col != dst->n_col)
@@ -210,6 +314,14 @@ void m_apply_dst(matrix_t* m, double (*fun)(double), matrix_t* dst)
         dst->array[i] = fun(m->array[i]);
 }
 
+/**
+ * @brief Applies a function to a matrix, stores the result in
+ *        a new matrix
+ * 
+ * @param m Matrix to apply function to
+ * @param fun Function to apply to matrix: takes double, returns double
+ * @return matrix_t* New matrix with applied values
+ */
 matrix_t* m_apply(matrix_t* m, double (*fun)(double))
 {
     matrix_t* dst = m_init(m->n_row, m->n_col);

@@ -11,26 +11,23 @@
 #ifndef NETWORK_H
 #define NETWORK_H
 
-/* Neural network public API */
-
 #include "matrix.h"
 
 typedef struct
 {
-    // Number of hidden layers + output layer
-    size_t L;
+    size_t L;           // n hidden layers + output layer
     size_t input_size;
     size_t hidden_size;
     size_t output_size;
 
-    matrix_t* X;
-    matrix_t* y;
+    matrix_t* X;        // Input data
+    matrix_t* y;        // Expected output
     
-    matrix_t** a;
-    matrix_t** z;
-    matrix_t** w;
-    matrix_t** b;
-    matrix_t** delta;
+    matrix_t** a;       // Activated neurons layer
+    matrix_t** z;       // Pre activated neurons layer
+    matrix_t** w;       // Weights layer
+    matrix_t** b;       // Biases layer
+    matrix_t** delta;   // Error delta layer
 } network_t;
 
 network_t* net_init(size_t input_size, size_t hidden_size, size_t output_size, size_t L);

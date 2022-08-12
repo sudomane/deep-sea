@@ -19,6 +19,11 @@
 
 /* NETWORK INTERNAL API */
 
+/**
+ * @brief Dynamic allocation of network layers
+ * 
+ * @param net Neural network struct
+ */
 static void _net_alloc_layers(network_t* net)
 {
     net->a = calloc(net->L, sizeof(matrix_t*));
@@ -55,6 +60,11 @@ static void _net_alloc_layers(network_t* net)
     net->w[net->L - 1] = m_init(net->hidden_size, net->output_size);
 }
 
+/**
+ * @brief Free network layers
+ * 
+ * @param net Neural network struct
+ */
 static void _net_free_layers(network_t* net)
 {
     m_free(net->X);
@@ -76,6 +86,11 @@ static void _net_free_layers(network_t* net)
     free(net->delta);
 }
 
+/**
+ * @brief Randomizes network weights and biases
+ * 
+ * @param net Neural network struct
+ */
 static void _net_init_layers(network_t* net)
 {
     for (size_t l = 0; l < net->L; l++)
@@ -85,6 +100,11 @@ static void _net_init_layers(network_t* net)
     }
 }
 
+/**
+ * @brief Feed forward algorithm
+ * 
+ * @param net Neural network struct
+ */
 static void _net_feed_forward(network_t* net)
 {
     m_mul(net->X, net->w[0], net->z[0]);
@@ -99,6 +119,11 @@ static void _net_feed_forward(network_t* net)
     }
 }
 
+/**
+ * @brief Backpropagation algorithm
+ * 
+ * @param net Neural network struct
+ */
 static void _net_backprop(network_t* net)
 {
     m_sub(net->a[net->L-1], net->y, net->delta[net->L-1]);
@@ -119,6 +144,11 @@ static void _net_backprop(network_t* net)
     }
 }
 
+/**
+ * @brief Update network weights with delta layer
+ * 
+ * @param net Neural network struct
+ */
 static void _net_update_weights(network_t* net)
 {
     double lr = 1;
@@ -137,6 +167,11 @@ static void _net_update_weights(network_t* net)
     }
 }
 
+/**
+ * @brief Update network biases with delta layer
+ * 
+ * @param net Neural network struct
+ */
 static void _net_update_bias(network_t* net)
 {
     double lr = 0.01;
@@ -148,12 +183,24 @@ static void _net_update_bias(network_t* net)
     }
 }
 
+/**
+ * @brief Initialize the network's input layer with data in X
+ * 
+ * @param net Neural network struct
+ * @param X Array containing input_size amount of data
+ */
 static void _net_init_X(network_t* net, double* X)
 {
     for(size_t i = 0; i < net->input_size; i++)
         net->X->array[i] = X[i];
 }    
 
+/**
+ * @brief Initilaize the network's expected output with data in y
+ * 
+ * @param net Neural network struct
+ * @param y Array containing output_size amount of data
+ */
 static void _net_init_y(network_t* net, double* y)
 {
     for(size_t i = 0; i < net->output_size; i++)
@@ -162,6 +209,15 @@ static void _net_init_y(network_t* net, double* y)
 
 /* NETWORK PUBLIC API */
 
+/**
+ * @brief Initialize the network with desired parameters
+ * 
+ * @param input_size Number of neurons in the input layer
+ * @param hidden_size Number of neurons in the hidden layer
+ * @param output_size Number of neurons in the output layer
+ * @param L Number of layers in the network, excluding the input layer
+ * @return network_t* Pointer to the initialized neural network struct
+ */
 network_t* net_init(size_t input_size, size_t hidden_size, size_t output_size, size_t L)
 {
     network_t* net = malloc(sizeof(network_t));
@@ -177,6 +233,11 @@ network_t* net_init(size_t input_size, size_t hidden_size, size_t output_size, s
     return net;
 }
 
+/**
+ * @brief Free the network
+ * 
+ * @param net Neural network struct
+ */
 void net_free(network_t* net)
 {
     _net_free_layers(net);
@@ -185,6 +246,11 @@ void net_free(network_t* net)
     net = NULL;
 }
 
+/**
+ * @brief Displays the network's various parameters, and their contents
+ * 
+ * @param net Neural network struct
+ */
 void net_display(network_t* net)
 {
     printf("Input layer:\n");
@@ -211,6 +277,12 @@ void net_display(network_t* net)
         m_display(net->delta[l]);
 }
 
+/**
+ * @brief Trains the network
+ * 
+ * @param net Neural network struct
+ * @param epochs Amount of times the network should iterate on training
+ */
 void net_train(network_t* net, size_t epochs)
 {
     double X_train[4][2] = {
