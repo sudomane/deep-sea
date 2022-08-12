@@ -20,3 +20,16 @@ make
 ```bash
 ./bin/ocr
 ```
+
+## Todo list
+
+* [x] Design efficient memory based neural network structure
+* [x] Implement matrix library
+* [x] Implement feed forward algorithm
+* [x] Implement backpropagation algorithm
+* [x] Test neural network with basic XOR network
+* [ ] Add saving and loading capabilities for the network
+* [ ] Refactor O(n^3) matrix multiplication to O(n^1) with multithread implementation
+* [ ] Implement mini batch training in the network for prediction versatility
+* [ ] Test neural network with OCR network trained to recognize handwritten digits
+* [ ] Implement basic cli interface to interact with the network
