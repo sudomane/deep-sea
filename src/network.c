@@ -299,7 +299,7 @@ void net_train(network_t* net, size_t epochs)
 		{0.f}
 	};
 
-    size_t index = 1;
+    size_t index = 0;
 
     for (size_t i = 0; i < epochs; i++)
     {

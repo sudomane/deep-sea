@@ -13,13 +13,13 @@
 #include <stdlib.h>
 
 /**
- * @brief Returns a randomly generated normalized float between 0 and 1
+ * @brief Returns a randomly generated normalized float between -1 and 1
  * 
  * @return double Value 
  */
 double normalized_rand(void)
 {
-    return (double) rand() / (double) RAND_MAX;
+    return (double) rand() / (double) RAND_MAX * 2 - 1;
 }
 
 /**
