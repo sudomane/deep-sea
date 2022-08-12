@@ -11,11 +11,12 @@ This project is still a work in progress.
 ## Running the project
 
 * Compile the source code
-```
+```bash
+make mkdir # Only needs to be executed once
 make
 ```
 
 * Run the binary
-```
+```bash
 ./bin/ocr
 ```
