@@ -1,3 +1,12 @@
+/**
+ * @file    matrix.c
+ * @author  Philippe Bouchet (philippe.bouchet@epita.fr)
+ * @brief   Matrix implementation.
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #include "matrix.h"
 
 #include <err.h>

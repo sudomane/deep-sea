@@ -1,3 +1,13 @@
+/**
+ * @file    network.c
+ * @author  Philippe Bouchet (philippe.bouchet@epita.fr)
+ * @brief   Neural network API implementation.
+ *          Internal API functions denoted with underscore preceding function name.
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #include "network.h"
 
 #include <err.h>
@@ -69,7 +79,7 @@ static void _net_free_layers(network_t* net)
     free(net->delta);
 }
 
-void _net_init_layers(network_t* net)
+static void _net_init_layers(network_t* net)
 {
     for (size_t l = 0; l < net->L; l++)
     {
@@ -78,24 +88,24 @@ void _net_init_layers(network_t* net)
     }
 }
 
-void _net_feed_forward(network_t* net)
+static void _net_feed_forward(network_t* net)
 {
     m_mul(net->X, net->w[0], net->z[0]);
     m_add(net->z[0], net->b[0], net->z[0]);
-    m_apply_dst(net->z[0], relu, net->a[0]);
+    m_apply_dst(net->z[0], sigmoid, net->a[0]);
 
     for (size_t l = 1; l < net->L; l++)
     {
         m_mul(net->a[l-1], net->w[l], net->z[l]);
         m_add(net->z[l], net->b[l], net->z[l]);
-        if (l < net->L-1)
-            m_apply_dst(net->z[l], relu, net->a[l]);
-        else
-            m_apply_dst(net->z[l], sigmoid, net->a[l]);
+//        if (l < net->L-1)
+//            m_apply_dst(net->z[l], relu, net->a[l]);
+//        else
+        m_apply_dst(net->z[l], sigmoid, net->a[l]);
     }
 }
 
-void _net_backprop(network_t* net)
+static void _net_backprop(network_t* net)
 {
     m_sub(net->a[net->L-1], net->y, net->delta[net->L-1]);
     matrix_t* d_zL = m_apply(net->z[net->L-1], d_sigmoid);
@@ -107,7 +117,8 @@ void _net_backprop(network_t* net)
         matrix_t* weights_trans = m_transpose(net->w[l+1]);
         m_mul(net->delta[l+1], weights_trans, net->delta[l]);
 
-        matrix_t* d_zl = m_apply(net->z[l], d_relu);
+//        matrix_t* d_zl = m_apply(net->z[l], d_relu);
+        matrix_t* d_zl = m_apply(net->z[l], d_sigmoid);
         m_hadamard(net->delta[l], d_zl, net->delta[l]);
 
         m_free(d_zl);
@@ -115,7 +126,7 @@ void _net_backprop(network_t* net)
     }
 }
 
-void _net_update_weights(network_t* net)
+static void _net_update_weights(network_t* net)
 {
     double lr = 1;
 
@@ -135,7 +146,7 @@ void _net_update_weights(network_t* net)
     }
 }
 
-void _net_update_bias(network_t* net)
+static void _net_update_bias(network_t* net)
 {
     double lr = 0.01;
 
@@ -146,6 +157,18 @@ void _net_update_bias(network_t* net)
         m_scalar_mul(net->delta[l], lr, net->delta[l]);
         m_sub(net->b[l], net->delta[l], net->b[l]);
     }
+}
+
+static void _net_init_X(network_t* net, double* X)
+{
+    for(size_t i = 0; i < net->input_size; i++)
+        net->X->array[i] = X[i];
+}    
+
+static void _net_init_y(network_t* net, double* y)
+{
+    for(size_t i = 0; i < net->output_size; i++)
+        net->y->array[i] = y[i];
 }
 
 /* NETWORK PUBLIC API */
@@ -171,18 +194,6 @@ void net_free(network_t* net)
     free(net);
 
     net = NULL;
-}
-
-void net_init_X(network_t* net, double* X)
-{
-    for(size_t i = 0; i < net->input_size; i++)
-        net->X->array[i] = X[i];
-}    
-
-void net_init_y(network_t* net, double* y)
-{
-    for(size_t i = 0; i < net->output_size; i++)
-        net->y->array[i] = y[i];
 }
 
 void net_display(network_t* net)
@@ -228,7 +239,7 @@ void net_train(network_t* net, size_t epochs)
 		{0.f}
 	};
 
-    size_t index = 0;
+    size_t index = 3;
 
     for (size_t i = 0; i < epochs; i++)
     {
@@ -240,8 +251,8 @@ void net_train(network_t* net, size_t epochs)
         double* X = X_train[index];
         double* y = y_train[index];
 
-        net_init_X(net, X);
-        net_init_y(net, y);
+        _net_init_X(net, X);
+        _net_init_y(net, y);
 
         _net_feed_forward(net);
         _net_backprop(net);

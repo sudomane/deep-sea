@@ -1,3 +1,12 @@
+/**
+ * @file    utils.c
+ * @author  Philippe Bouchet (philippe.bouchet@epita.fr)
+ * @brief   Utility functions implementation.
+ *
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #include "utils.h"
 
 #include <math.h>
@@ -20,10 +29,10 @@ double d_sigmoid(double x)
 
 double relu(double x)
 {
-    return x > 0.f ? x : 0.f;
+    return x > 0.f ? 0.01f * x : 0.f;
 }
 
 double d_relu(double x)
 {
-    return x > 0.f ? 1.f : 0.f;
+    return x > 0.f ? 0.01f : 0.f;
 }

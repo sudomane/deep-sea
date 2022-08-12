@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
 
 	size_t L = 10;
 	size_t input_size = 2;
-	size_t hidden_size = 2;
+	size_t hidden_size = 12;
 	size_t output_size = 1;
 	
 	network_t* net = net_init(input_size, hidden_size, output_size, L);

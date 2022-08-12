@@ -1,7 +1,12 @@
-/*
-** Matrix-implementation of the multi-layer perceptron network,
-** (fully connected network).
-*/
+/**
+ * @file    network.h
+ * @author  Philippe Bouchet (philippe.bouchet@epita.fr)
+ * @brief   Neural network API header.
+ *          Public API functions denoted with "net" prefix.
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
 
 #ifndef NETWORK_H
 #define NETWORK_H
@@ -31,10 +36,9 @@ typedef struct
 network_t* net_init(size_t input_size, size_t hidden_size, size_t output_size, size_t L);
 void net_free(network_t* net);
 
-void net_init_X(network_t* net, double* X);
-void net_init_y(network_t* net, double* y);
-
 void net_display(network_t* net);
 void net_train(network_t* net, size_t epochs);
+
+void net_evaluate(network_t* net);
 
 #endif // NETWORK_H

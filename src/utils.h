@@ -1,7 +1,14 @@
+/**
+ * @file    utils.h
+ * @author  Philippe Bouchet (philippe.bouchet@epita.fr)
+ * @brief   Utility functions, mathematical formulas, etc...
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #ifndef UTILS_H
 #define UTILS_H
-
-/* Neural network internal API */
 
 double normalized_rand(void);
 double sigmoid(double x);

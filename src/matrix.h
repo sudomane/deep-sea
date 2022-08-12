@@ -1,7 +1,14 @@
+/**
+ * @file    matrix.h
+ * @author  Philippe Bouchet (philippe.bouchet@epita.fr)
+ * @brief   Pseudo-2D matrix implementation, with memory based operations.
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #ifndef MATRIX_H
 #define MATRIX_H
-
-/* Neural network internal API */
 
 typedef unsigned long size_t;
 
@@ -9,7 +16,7 @@ typedef struct
 {
     double* array;
     
-    size_t size; // Total size of array n_row * n_col
+    size_t size;
     size_t n_row;
     size_t n_col;
 } matrix_t;
