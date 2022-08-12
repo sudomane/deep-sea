@@ -39,6 +39,9 @@ CLEAN_LIST = $(TARGET) \
 # Default rule:
 default: clean all
 
+# Make directory rule:
+mkdir: makedir
+
 # Non phony rules
 $(TARGET) : $(OBJ)
 	$(CC) $(CCFLAGS) -o $@ $(OBJ) $(CCLIBS)
