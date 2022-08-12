@@ -21,16 +21,15 @@
 
 static void _net_alloc_layers(network_t* net)
 {
-    net->X = m_init(1, net->input_size);
-    net->y = m_init(1, net->output_size);
-
     net->a = calloc(net->L, sizeof(matrix_t*));
     net->z = calloc(net->L, sizeof(matrix_t*));
     net->w = calloc(net->L, sizeof(matrix_t*));
     net->b = calloc(net->L, sizeof(matrix_t*));
     net->delta = calloc(net->L, sizeof(matrix_t*));
 
-    // Input layer
+    net->X = m_init(1, net->input_size);
+    net->y = m_init(1, net->output_size);
+
     net->a[0] = m_init(1, net->hidden_size);
     net->z[0] = m_init(1, net->hidden_size);
     net->b[0] = m_init(1, net->hidden_size);
@@ -38,7 +37,6 @@ static void _net_alloc_layers(network_t* net)
 
     net->w[0] = m_init(net->input_size, net->hidden_size);
 
-    // Hidden layers
     for (size_t l = 1; l < net->L - 1; l++)
     {
         net->a[l] = m_init(1, net->hidden_size);
@@ -49,7 +47,6 @@ static void _net_alloc_layers(network_t* net)
         net->w[l] = m_init(net->hidden_size, net->hidden_size);
     }
 
-    // Output layer
     net->a[net->L - 1] = m_init(1, net->output_size);
     net->z[net->L - 1] = m_init(1, net->output_size);
     net->b[net->L - 1] = m_init(1, net->output_size);
@@ -98,9 +95,6 @@ static void _net_feed_forward(network_t* net)
     {
         m_mul(net->a[l-1], net->w[l], net->z[l]);
         m_add(net->z[l], net->b[l], net->z[l]);
-//        if (l < net->L-1)
-//            m_apply_dst(net->z[l], relu, net->a[l]);
-//        else
         m_apply_dst(net->z[l], sigmoid, net->a[l]);
     }
 }
@@ -117,7 +111,6 @@ static void _net_backprop(network_t* net)
         matrix_t* weights_trans = m_transpose(net->w[l+1]);
         m_mul(net->delta[l+1], weights_trans, net->delta[l]);
 
-//        matrix_t* d_zl = m_apply(net->z[l], d_relu);
         matrix_t* d_zl = m_apply(net->z[l], d_sigmoid);
         m_hadamard(net->delta[l], d_zl, net->delta[l]);
 
@@ -132,8 +125,6 @@ static void _net_update_weights(network_t* net)
 
     for (size_t l = net->L - 1; l > 0; l--)
     {
-        //net->w[l] = net->w[l] - lr * net->delta[l] * net->a[l-1].T
-
         matrix_t* a_trans = m_transpose(net->a[l-1]);
         matrix_t* w_copy = m_copy(net->w[l]);
         
@@ -152,8 +143,6 @@ static void _net_update_bias(network_t* net)
 
     for (size_t l = net->L - 1; l > 0; l--)
     {
-        //net->b[l] = net->b[l] - lr * net->delta[l];
-
         m_scalar_mul(net->delta[l], lr, net->delta[l]);
         m_sub(net->b[l], net->delta[l], net->b[l]);
     }
@@ -224,7 +213,6 @@ void net_display(network_t* net)
 
 void net_train(network_t* net, size_t epochs)
 {
-    // Testing training with single input XOR network
     double X_train[4][2] = {
 		{0.f, 0.f},
 		{0.f, 1.f},
@@ -239,12 +227,10 @@ void net_train(network_t* net, size_t epochs)
 		{0.f}
 	};
 
-    size_t index = 3;
+    size_t index = 1;
 
     for (size_t i = 0; i < epochs; i++)
     {
-        //printf("Epoch: [%zu / %zu]\n", i+1, epochs);
-
         size_t X_rand = rand() % 4;
         size_t y_rand = rand() % 4;
 
@@ -263,5 +249,8 @@ void net_train(network_t* net, size_t epochs)
     printf("Completed %zu epochs!\n", epochs);
 
     printf("\nInput: %f, %f\n\n", X_train[index][0], X_train[index][1]);
-    printf("Prediction:\t%f\nExpected\t%f\n", net->a[net->L-1]->array[0], y_train[index][0]);
+    
+    printf("Prediction:\t%f\nExpected\t%f\n",
+            net->a[net->L-1]->array[0],
+            y_train[index][0]);
 }

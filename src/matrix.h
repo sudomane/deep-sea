@@ -10,6 +10,14 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
+#define MATRIX_FAILED_INITIALIZE        -1
+#define MATRIX_OUT_OF_BOUNDS            -2
+#define MATRIX_FAILED_MULTIPLICATION    -3
+#define MATRIX_FAILED_ADDITION          -4
+#define MATRIX_FAILED_SUBSTRACTION      -5
+#define MATRIX_FAILED_HADAMARD          -6
+#define MATRIX_FAILED_APPLY             -7
+
 typedef unsigned long size_t;
 
 typedef struct
