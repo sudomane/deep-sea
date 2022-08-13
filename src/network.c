@@ -306,6 +306,7 @@ void net_display(network_t* net)
  */
 void net_train(network_t* net, dataset_t* data, size_t epochs)
 {
+    printf("\n[Training]\n\n");
     for (size_t e = 0; e < epochs; e++)
     {
         printf("Epoch %zu / %zu\n", e+1, epochs);
@@ -334,8 +335,7 @@ void net_train(network_t* net, dataset_t* data, size_t epochs)
         }    
     }
     
-    system("clear");
-    printf("Completed %zu epochs!\n", epochs);
+    printf("\nCompleted %zu epochs!\n", epochs);
 }
 
 /**
