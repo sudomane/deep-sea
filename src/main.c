@@ -34,10 +34,9 @@ int main(int argc, char* argv[])
 {	
 	srand(0);
 
-	// Bug (?): Stagnates with L > 2
 	size_t L = 2;
 	size_t input_size = 2;
-	size_t hidden_size = 20;
+	size_t hidden_size = 2;
 	size_t output_size = 1;
 	
 	size_t batch_size = 3;

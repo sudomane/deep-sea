@@ -153,11 +153,11 @@ static void _net_backprop(network_t* net)
 }
 
 /**
- * @brief Computes gradient descent on training examples of determined batch size 
+ * @brief Computes gradient descent on training examples on determined batch size 
  * 
  * @param net Neural network struct
  */
-static void _net_mini_batch(network_t* net)
+static void _net_mini_batch_gradient_descent(network_t* net)
 {
     matrix_t* grad_w;
     matrix_t* a_T;
@@ -342,7 +342,7 @@ void net_train(network_t* net, size_t epochs)
 
             _net_feed_forward(net);
             _net_backprop(net);
-            _net_mini_batch(net);
+            _net_mini_batch_gradient_descent(net);
         }
         
         _net_update(net);
