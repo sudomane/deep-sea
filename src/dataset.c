@@ -201,10 +201,8 @@ void data_load_mnist(const char* path, dataset_t* data, int load_type)
             {
                 unsigned char tmp;
                 read(fd, &tmp, sizeof(unsigned char));
-
                 
-                double x = ((double) tmp / 255.f);
-                double normalized = normalize(x);
+                double normalized = normalize((double) tmp);
                 data->X[n][i] = normalized;
             }
         }
