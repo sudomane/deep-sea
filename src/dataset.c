@@ -148,7 +148,7 @@ void data_load_mnist(const char* path, dataset_t* data, int load_type)
     int fd = open(path, O_RDONLY);
     
     if (fd == -1)
-        errx(-1, "ERROR::LOAD DATASET: Could not open file: %s "
+        errx(-1, "ERROR::DATASET::LOAD : Could not open file: %s "
                  "(Invalid path, or corrupted file).", path);
 
     int magic =     0;
@@ -182,7 +182,7 @@ void data_load_mnist(const char* path, dataset_t* data, int load_type)
 
     if (data->n > (size_t) n_images)
     {
-        warnx("WARNING::LOAD DATASET: Expected %zu elements, got %zu. "
+        warnx("WARNING::DATASET::INCOMPATIBLE SIZE: Expected %zu elements, got %zu. "
               "Setting data->n to %zu.",
               (size_t) n_images, data->n, (size_t) n_images);
         data->n = n_images;
