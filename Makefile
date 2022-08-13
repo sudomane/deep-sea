@@ -1,6 +1,6 @@
 # Tool macros
 CC := clang
-CCFLAGS :=
+CCFLAGS := -Wall -Wextra -Werror
 DBGFLAGS := -g
 CCOBJFLAGS := $(CCFLAGS) -c
 CCLIBS := -lm
@@ -47,10 +47,10 @@ $(TARGET) : $(OBJ)
 	$(CC) $(CCFLAGS) -o $@ $(OBJ) $(CCLIBS)
 
 $(OBJ_PATH)/%.o : $(SRC_PATH)/%.c*
-	$(CC) $(CCOBJFLAGS) -o $@ $< $(CCLIBS)
+	$(CC) $(CCOBJFLAGS) -o $@ $<
 
 $(DBG_PATH)/%.o : $(SRC_PATH)/%.c*
-	$(CC) $(CCOBJFLAGS) $(DBGFLAGS) -o $@ $< $(CCLIBS)
+	$(CC) $(CCOBJFLAGS) $(DBGFLAGS) -o $@ $<
 
 $(TARGET_DEBUG) : $(OBJ_DEBUG)
 	$(CC) $(CCFLAGS) $(DBGFLAGS) $(OBJ_DEBUG) -o $@ $(CCLIBS)
