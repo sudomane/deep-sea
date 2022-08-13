@@ -92,6 +92,17 @@ matrix_t* m_copy(matrix_t* m)
 }
 
 /**
+ * @brief Resets matrix values to 0
+ * 
+ * @param m Matrix to reset
+ */
+void m_reset(matrix_t* m)
+{
+    for (size_t i = 0; i < m->size; i++)
+        m->array[i] = 0.f;
+}
+
+/**
  * @brief Fills a matrix with a function's return value.
  * 
  * @param m Matrix to fill

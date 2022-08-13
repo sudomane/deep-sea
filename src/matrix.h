@@ -37,6 +37,7 @@ double m_get(matrix_t* m, size_t row, size_t col);
 void m_display(matrix_t* m);
 
 matrix_t* m_copy(matrix_t* m);
+void m_reset(matrix_t* m);
 void m_fill(matrix_t* m, double (*fun)(void));
 
 void m_mul(matrix_t* m1, matrix_t* m2, matrix_t* dst);
