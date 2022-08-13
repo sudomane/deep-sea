@@ -6,13 +6,18 @@ This project aims to implement a multi-layer perceptron network in the C program
 
 The network is matrix based, calculations are performed via matrix operations, allowing for easy implementation of feed forward, backpropagation and gradient descent algorithms.
 
-This project is still a work in progress.
+## MNIST dataset
+
+The network was tested and trained with the MNIST hand-written digit dataset. The accuracy of the network has yet to be benchmarked.
+
+To download the dataset, simply run the `download_data.sh` script.
 
 ## Running the project
 
 * Compile the source code
 ```bash
-make mkdir # Only needs to be executed once
+make mkdir # Generates the bin/ and obj/ folders
+           # Only needs to be run once.
 make
 ```
 
@@ -29,8 +34,8 @@ make
 * [x] Implement backpropagation algorithm
 * [x] Test neural network with basic XOR network
 * [x] Add saving and loading capabilities for the network
-* [ ] Speed up matrix multiplication with multithread implementation
 * [x] Implement mini batch training in the network for prediction versatility
 * [X] Implement dataset API to easily pass data into the network
 * [x] Test neural network with OCR network trained to recognize handwritten digits
+* [ ] Speed up matrix multiplication with multithread implementation (CPU or GPU)
 * [ ] Implement basic cli interface to interact with the network
