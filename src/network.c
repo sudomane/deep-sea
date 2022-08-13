@@ -306,9 +306,9 @@ void net_display(network_t* net)
  */
 void net_train(network_t* net, dataset_t* data, size_t epochs)
 {
-    for (size_t i = 0; i < epochs; i++)
+    for (size_t e = 0; e < epochs; e++)
     {
-        printf("Epoch %zu / %zu\n", i+1, epochs);
+        printf("Epoch %zu / %zu\n", e+1, epochs);
         for (size_t l = 0; l < net->L; l++)
         {
             m_reset(net->delta[l]);
@@ -318,21 +318,25 @@ void net_train(network_t* net, dataset_t* data, size_t epochs)
         
         data_shuffle(data);
         
-        for (size_t j = 0; j < net->batch_size; j++)
+        for (size_t b = 0; b < data->n - net->batch_size + 1; b++)
         {
-            double* X = data->X[j];
-            double* y = data->y[j];
+            for (size_t i = b; i < net->batch_size + b; i++)
+            {
+                double* X = data->X[i];
+                double* y = data->y[i];
 
-            _net_init_X(net, X);
-            _net_init_y(net, y);
+                _net_init_X(net, X);
+                _net_init_y(net, y);
 
-            _net_feed_forward(net);
-            _net_backprop(net);
-            _net_mini_batch_gradient_descent(net);
-        }
-        
-        _net_update(net);
+                _net_feed_forward(net);
+                _net_backprop(net);
+                _net_mini_batch_gradient_descent(net);
+            }
+
+            _net_update(net);
+        }    
     }
+    
     system("clear");
     printf("Completed %zu epochs!\n", epochs);
 }

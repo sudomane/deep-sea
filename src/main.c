@@ -37,9 +37,9 @@ int main(int argc, char* argv[])
 	
 	srand(0);
 
-	size_t L = 5;
+	size_t L = 3;
 	size_t input_size = 2;
-	size_t hidden_size = 20;
+	size_t hidden_size = 4;
 	size_t output_size = 1;
 	
 	size_t n_data = 4;
@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
 	dataset_t* data = data_init(n_data, input_size, output_size);
 	network_t* net = net_init(L, input_size, hidden_size, output_size, batch_size, lr);
 	
-	net_train(net, data, 10000);
+	net_train(net, data, 100000);
 
 	interactive_mode(net);
 
