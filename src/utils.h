@@ -11,6 +11,7 @@
 #define UTILS_H
 
 double normalized_rand(void);
+double normalize(double x);
 double sigmoid(double x);
 double d_sigmoid(double x);
 double relu(double x);

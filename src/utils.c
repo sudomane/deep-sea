@@ -15,11 +15,22 @@
 /**
  * @brief Returns a randomly generated normalized float between -1 and 1
  * 
- * @return double Value 
+ * @return Randomly generated normalized value
  */
 double normalized_rand(void)
 {
     return ((double) rand() / (double) RAND_MAX) * 2 - 1;
+}
+
+/**
+ * @brief Normalizes range [0, 255] to [-1, 1]
+ * 
+ * @param x Value to normalize
+ * @return Normalized value
+ */
+double normalize(double x)
+{
+    return 2.f * (x / 255.f) - 1.f;
 }
 
 /**
