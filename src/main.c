@@ -18,6 +18,8 @@ int main(int argc, char* argv[])
 				  "\n\t./main [MNIST IMAGE PATH] [MNIST LABEL PATH]");
 	}
 
+	srand(0);
+	
 	const char* image_data = IMAGE_DATA;
 	const char* label_data = LABEL_DATA;
 
@@ -27,15 +29,13 @@ int main(int argc, char* argv[])
 		label_data = argv[2];
 	}
 	
-	srand(0);
-
 	size_t L = 3;
 	size_t input_size = 784;
 	size_t hidden_size = 16;
 	size_t output_size = 10;
 	
-	size_t n_data = 1;
-	size_t batch_size = 32;
+	size_t n_data = 512;
+	size_t batch_size = 64;
 	double lr = 0.1f;
 	
 	dataset_t* data = data_init(n_data, input_size, output_size);
@@ -44,8 +44,7 @@ int main(int argc, char* argv[])
 	data_load_mnist(image_data, data, LOAD_IMAGES);
 	data_load_mnist(label_data, data, LOAD_LABELS);
 
-	data_display(data);
-	//net_train(net, data, 100);
+	net_train(net, data, 1);
 
 	net_free(net);
 	data_free(data);
