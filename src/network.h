@@ -12,6 +12,7 @@
 #define NETWORK_H
 
 #include "matrix.h"
+#include "dataset.h"
 
 typedef struct
 {
@@ -39,7 +40,7 @@ network_t* net_init(size_t L, size_t input_size, size_t hidden_size, size_t outp
 void net_free(network_t* net);
 
 void net_display(network_t* net);
-void net_train(network_t* net, size_t epochs);
+void net_train(network_t* net, dataset_t* dataset, size_t epochs);
 
 void net_evaluate(network_t* net);
 void net_predict(network_t* net, double* X);

@@ -32,24 +32,29 @@ void interactive_mode(network_t* net)
 
 int main(int argc, char* argv[])
 {	
+	(void) argc;
+	(void) argv;
+	
 	srand(0);
 
-	size_t L = 2;
+	size_t L = 5;
 	size_t input_size = 2;
-	size_t hidden_size = 2;
+	size_t hidden_size = 20;
 	size_t output_size = 1;
 	
-	size_t batch_size = 3;
+	size_t n_data = 4;
+	size_t batch_size = 2;
 	double lr = 0.1f;
 	
+	dataset_t* data = data_init(n_data, input_size, output_size);
 	network_t* net = net_init(L, input_size, hidden_size, output_size, batch_size, lr);
 	
-	net_train(net, 10000);
-	//net_display(net);
+	net_train(net, data, 10000);
 
 	interactive_mode(net);
 
 	net_free(net);
+	data_free(data);
 
 	return 0;
 }

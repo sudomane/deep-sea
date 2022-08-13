@@ -304,23 +304,8 @@ void net_display(network_t* net)
  * @param net Neural network struct
  * @param epochs Amount of times the network should iterate on training
  */
-void net_train(network_t* net, size_t epochs)
+void net_train(network_t* net, dataset_t* data, size_t epochs)
 {
-    // Todo: Pass dataset externally  via dataset API
-    double X_train[4][2] = {
-		{0.f, 0.f},
-		{0.f, 1.f},
-		{1.f, 0.f},
-		{1.f, 1.f}
-	};
-
-	double y_train[4][1] = {
-		{0.f},
-		{1.f},
-		{1.f},
-		{0.f}
-	};
-
     for (size_t i = 0; i < epochs; i++)
     {
         printf("Epoch %zu / %zu\n", i+1, epochs);
@@ -331,11 +316,12 @@ void net_train(network_t* net, size_t epochs)
             m_reset(net->grad_w[l]);
         }
         
-        // Todo: Shuffle data
+        data_shuffle(data);
+        
         for (size_t j = 0; j < net->batch_size; j++)
         {
-            double* X = X_train[j];
-            double* y = y_train[j];
+            double* X = data->X[j];
+            double* y = data->y[j];
 
             _net_init_X(net, X);
             _net_init_y(net, y);
