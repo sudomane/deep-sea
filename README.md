@@ -25,7 +25,7 @@ make
 
 * Execute the binary
 ```bash
-./bin/ocr
+./bin/ocr N_epochs
 ```
 
 ## Roadmap
