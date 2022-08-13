@@ -322,11 +322,8 @@ void net_train(network_t* net, dataset_t* data, size_t epochs)
         {
             for (size_t i = b; i < net->batch_size + b; i++)
             {
-                double* X = data->X[i];
-                double* y = data->y[i];
-
-                _net_init_X(net, X);
-                _net_init_y(net, y);
+                _net_init_X(net, data->X[i]);
+                _net_init_y(net, data->y[i]);
 
                 _net_feed_forward(net);
                 _net_backprop(net);

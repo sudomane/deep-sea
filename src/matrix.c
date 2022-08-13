@@ -199,12 +199,12 @@ void m_add(matrix_t* m1, matrix_t* m2, matrix_t* dst)
 {
     if (m1->n_col != m2->n_col || m1->n_row != m2->n_row)
         errx(MATRIX_FAILED_ADDITION,
-            "ADD: Incompatible shapes (%zu, %zu) and (%zu, %zu)",
+            "ERROR::ADD: Incompatible shapes (%zu, %zu) and (%zu, %zu)",
             m1->n_row, m1->n_col, m2->n_row, m2->n_col);
 
     if (m1->n_col != dst->n_col || m1->n_row != dst->n_row)
         errx(MATRIX_FAILED_ADDITION,
-            "ADD: Incompatible dst. Got (%zu, %zu), expected (%zu, %zu)",
+            "ERROR::ADD: Incompatible dst. Got (%zu, %zu), expected (%zu, %zu)",
             m1->n_row, m1->n_col, dst->n_row, dst->n_col);
 
     for (size_t i = 0; i < m1->size; i++)
@@ -222,12 +222,12 @@ void m_sub(matrix_t* m1, matrix_t* m2, matrix_t* dst)
 {
     if (m1->n_col != m2->n_col || m1->n_row != m2->n_row)
         errx(MATRIX_FAILED_SUBSTRACTION,
-            "SUB: Incompatible shapes (%zu, %zu) and (%zu, %zu)",
+            "ERROR::SUB: Incompatible shapes (%zu, %zu) and (%zu, %zu)",
             m1->n_row, m1->n_col, m2->n_row, m2->n_col);
 
     if (m1->n_col != dst->n_col || m1->n_row != dst->n_row)
         errx(MATRIX_FAILED_SUBSTRACTION,
-            "SUB: Incompatible dst. Got (%zu, %zu), expected (%zu, %zu)",
+            "ERROR::SUB: Incompatible dst. Got (%zu, %zu), expected (%zu, %zu)",
             m1->n_row, m1->n_col, dst->n_row, dst->n_col);
 
     for (size_t i = 0; i < m1->size; i++)
@@ -272,12 +272,12 @@ void m_hadamard(matrix_t* m1, matrix_t* m2, matrix_t* dst)
 {
     if (m1->n_col != m2->n_col || m1->n_row != m2->n_row)
         errx(MATRIX_FAILED_HADAMARD,
-            "HADAMARD: Incompatible shapes (%zu, %zu) and (%zu, %zu).",
+            "ERROR::HADAMARD: Incompatible shapes (%zu, %zu) and (%zu, %zu).",
             m1->n_row, m1->n_col, m2->n_row, m2->n_col);
     
     if (m1->n_col != dst->n_col || m1->n_row != dst->n_row)
         errx(MATRIX_FAILED_HADAMARD,
-            "HADAMARD: Incompatible dst. Got (%zu, %zu), expected (%zu, %zu)",
+            "ERROR::HADAMARD: Incompatible dst. Got (%zu, %zu), expected (%zu, %zu)",
             m1->n_row, m1->n_col, dst->n_row, dst->n_col);
     
     for (size_t i = 0; i < m1->size; i++)
@@ -318,7 +318,7 @@ void m_apply_dst(matrix_t* m, double (*fun)(double), matrix_t* dst)
 {
     if (m->n_row != dst->n_row || m->n_col != dst->n_col)
         errx(MATRIX_FAILED_APPLY,
-            "APPLY: Incompatible dst.  Got (%zu, %zu), expected (%zu, %zu)",
+            "ERROR::APPLY: Incompatible dst.  Got (%zu, %zu), expected (%zu, %zu)",
             m->n_row, m->n_col, dst->n_row, dst->n_col);
 
     for (size_t i = 0; i < m->size; i++)
