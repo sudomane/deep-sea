@@ -15,10 +15,9 @@
 
 int main(int argc, char* argv[])
 {
-	if (argc != 1 && argc != 3)
+	if (argc != 2)
 	{
-		errx(-42, "Correct usage:\n\t./main (no arguments, default MNIST in data/)"
-				  "\n\t./main [MNIST IMAGE PATH] [MNIST LABEL PATH]");
+		errx(-42, "Correct usage:\n\t./main epochs");
 	}
 
 	srand(time(NULL));
@@ -29,15 +28,9 @@ int main(int argc, char* argv[])
 	const char* test_image_data =	TEST_IMAGE_DATA;
 	const char* test_label_data =	TEST_LABEL_DATA;
 
-	if (argc == 3)
-	{
-		train_image_data = argv[1];
-		train_label_data = argv[2];
-	}
+	size_t epochs =		 	(size_t) atoi(argv[1]);
 	
-	size_t epochs =		 	100;
-	
-	size_t L =			 	4;
+	size_t L =			 	7;
 	size_t input_size =		784;
 	size_t hidden_size = 	32;
 	size_t output_size = 	10;
