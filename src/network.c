@@ -464,6 +464,12 @@ void net_train(network_t* net, dataset_t* data, size_t epochs)
     printf("\nCompleted %zu epochs!\n\n", epochs);
 }
 
+/**
+ * @brief Calculate network accuracy on test dataset
+ * 
+ * @param net Neural network struct
+ * @param dataset Test dataset
+ */
 void net_evaluate(network_t* net, dataset_t* dataset)
 {
     double accuracy = 0.f;
@@ -483,14 +489,14 @@ void net_evaluate(network_t* net, dataset_t* dataset)
             else
                 net->a[net->L - 1]->array[i] = 0.f;
         }
-
+/*
         for (size_t i = 0; i < net->output_size; i++)
         {
             printf("[%zu] - y_h: %f ", i, net->a[net->L - 1]->array[i]);
             printf("y: %f ", net->y->array[i]);
             printf("\n");
         }
-
+*/
         accuracy += (double) _net_check_pred(net);
     }
 
