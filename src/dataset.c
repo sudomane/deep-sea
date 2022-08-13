@@ -195,6 +195,7 @@ void data_load_mnist(const char* path, dataset_t* data, int load_type)
 
     if (load_type == LOAD_IMAGES)
     {
+        // Reduce amount of read syscalls to O(n)
         for (size_t n = 0; n < data->n; n++)
         {
             for (size_t i = 0; i < data->n_input; i++)
