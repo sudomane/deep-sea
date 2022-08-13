@@ -489,20 +489,13 @@ void net_evaluate(network_t* net, dataset_t* dataset)
             else
                 net->a[net->L - 1]->array[i] = 0.f;
         }
-/*
-        for (size_t i = 0; i < net->output_size; i++)
-        {
-            printf("[%zu] - y_h: %f ", i, net->a[net->L - 1]->array[i]);
-            printf("y: %f ", net->y->array[i]);
-            printf("\n");
-        }
-*/
+
         accuracy += (double) _net_check_pred(net);
     }
 
     accuracy /= dataset->n;
 
-    printf("\nNetwork accuracy: [%f]%%\n\n", accuracy * 100);
+    printf("\nNetwork accuracy: [%f%%]\n\n", accuracy * 100);
 }
 
 /**
