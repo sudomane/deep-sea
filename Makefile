@@ -1,39 +1,35 @@
 # Tool macros
 CC := clang
 CCFLAGS := -Wall -Wextra -Werror
-DBGFLAGS := -g
+CCDBGFLAGS := -g
 CCOBJFLAGS := $(CCFLAGS) -c
 CCLIBS := -lm
 
 # Path macros
 SRC_PATH := src
-SRC_TEST_PATH := test
 BIN_PATH := bin
 OBJ_PATH := obj
-DEBUG_PATH := debug
 
 # Source files
 SRC := $(foreach x, $(SRC_PATH), $(wildcard $(addprefix $(x)/*, .c*)))
 
 # Object files
 OBJ := $(addprefix $(OBJ_PATH)/, $(addsuffix .o, $(notdir $(basename $(SRC)))))
-OBJ_DEBUG := $(addprefix $(DEBUG_PATH)/, $(addsuffix .o, $(notdir $(basename $(SRC)))))
 
 # Compile macros
 TARGET_NAME := ocr
+DBG_TARGET_NAME := ocr_debug
 ifeq ($(OS), Windows_NT)
 	TARGET_NAME := $(addsuffix .exe, $(TARGET_NAME))
 endif
 
 TARGET := $(BIN_PATH)/$(TARGET_NAME)
-TARGET_DEBUG := $(DEBUG_PATH)/$(TARGET_NAME)
+TARGET_DBG := $(BIN_PATH)/$(DBG_TARGET_NAME)
 
 # Clean files list
-DISTCLEAN_LIST = $(OBJ) \
-					$(OBJ_DEBUG)
+DISTCLEAN_LIST = $(OBJ)
 
 CLEAN_LIST = $(TARGET) \
-				$(TARGET_DEBUG) \
 				$(DISTCLEAN_LIST)
 
 # Default rule:
@@ -46,14 +42,11 @@ mkdir: makedir
 $(TARGET) : $(OBJ)
 	$(CC) $(CCFLAGS) -o $@ $(OBJ) $(CCLIBS)
 
+$(TARGET_DBG) : $(OBJ)
+	$(CC) $(CCFLAGS) $(CCDBGFLAGS) -o $@ $(OBJ) $(CCLIBS)
+
 $(OBJ_PATH)/%.o : $(SRC_PATH)/%.c*
 	$(CC) $(CCOBJFLAGS) -o $@ $<
-
-$(DBG_PATH)/%.o : $(SRC_PATH)/%.c*
-	$(CC) $(CCOBJFLAGS) $(DBGFLAGS) -o $@ $<
-
-$(TARGET_DEBUG) : $(OBJ_DEBUG)
-	$(CC) $(CCFLAGS) $(DBGFLAGS) $(OBJ_DEBUG) -o $@ $(CCLIBS)
 
 # Phony rules
 .PHONY: run
@@ -64,11 +57,11 @@ run:
 makedir:
 	@mkdir $(BIN_PATH) $(OBJ_PATH) $(DEBUG_PATH)
 
+.PHONY: debug
+debug: $(TARGET_DBG)
+
 .PHONY: all
 all: $(TARGET)
-
-.PHONY: debug
-debug: $(TARGET_DEBUG)
 
 .PHONY: clean
 clean:
