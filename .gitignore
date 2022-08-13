@@ -1,10 +1,9 @@
 a.out
 
-*.o
 .vscode
 
 *.save
+
 data/*
 bin/*
-debug/*
 obj/*
