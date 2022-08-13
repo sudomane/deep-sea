@@ -28,9 +28,9 @@ make
 * [x] Implement feed forward algorithm
 * [x] Implement backpropagation algorithm
 * [x] Test neural network with basic XOR network
-* [ ] Add saving and loading capabilities for the network
+* [x] Add saving and loading capabilities for the network
 * [ ] Speed up matrix multiplication with multithread implementation
 * [x] Implement mini batch training in the network for prediction versatility
-* [ ] Implement dataset API to easily pass data into the network
-* [ ] Test neural network with OCR network trained to recognize handwritten digits
+* [X] Implement dataset API to easily pass data into the network
+* [x] Test neural network with OCR network trained to recognize handwritten digits
 * [ ] Implement basic cli interface to interact with the network
