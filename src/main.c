@@ -8,7 +8,7 @@
 
 int main(int argc, char* argv[])
 {	
-	srand(time(NULL));
+	srand(0);
 
 	size_t L = 2;
 	size_t input_size = 2;

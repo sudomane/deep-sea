@@ -19,7 +19,7 @@
  */
 double normalized_rand(void)
 {
-    return (double) rand() / (double) RAND_MAX * 2 - 1;
+    return ((double) rand() / (double) RAND_MAX) * 2 - 1;
 }
 
 /**

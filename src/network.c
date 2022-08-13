@@ -230,10 +230,11 @@ static void _net_init_y(network_t* net, double* y)
 /**
  * @brief Initialize the network with desired parameters
  * 
+ * @param L Number of layers in the network, excluding the input layer
  * @param input_size Number of neurons in the input layer
  * @param hidden_size Number of neurons in the hidden layer
  * @param output_size Number of neurons in the output layer
- * @param L Number of layers in the network, excluding the input layer
+ * @param batch_size Amount of data to be used per epoch
  * @return network_t* Pointer to the initialized neural network struct
  */
 network_t* net_init(size_t L, size_t input_size, size_t hidden_size, size_t output_size, size_t batch_size, double lr)
@@ -305,7 +306,7 @@ void net_display(network_t* net)
  */
 void net_train(network_t* net, size_t epochs)
 {
-    // Todo: Pass dataset externally
+    // Todo: Pass dataset externally  via dataset API
     double X_train[4][2] = {
 		{0.f, 0.f},
 		{0.f, 1.f},
@@ -329,6 +330,7 @@ void net_train(network_t* net, size_t epochs)
             m_reset(net->grad_w[l]);
         }
         
+        // Todo: Shuffle data
         for (size_t j = 0; j < net->batch_size; j++)
         {
             double* X = X_train[j];
