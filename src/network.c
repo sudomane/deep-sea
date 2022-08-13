@@ -299,7 +299,7 @@ void net_display(network_t* net)
 }
 
 /**
- * @brief Trains the network
+ * @brief Train the network
  * 
  * @param net Neural network struct
  * @param epochs Amount of times the network should iterate on training

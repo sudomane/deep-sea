@@ -29,6 +29,8 @@ int main(int argc, char* argv[])
 		label_data = argv[2];
 	}
 	
+	size_t epochs = 10;
+	
 	size_t L = 3;
 	size_t input_size = 784;
 	size_t hidden_size = 16;
@@ -38,16 +40,16 @@ int main(int argc, char* argv[])
 	size_t batch_size = 64;
 	double lr = 0.1f;
 	
-	dataset_t* data = data_init(n_data, input_size, output_size);
+	dataset_t* train_dataset = data_init(n_data, input_size, output_size);
 	network_t* net = net_init(L, input_size, hidden_size, output_size, batch_size, lr);
 	
-	data_load_mnist(image_data, data, LOAD_IMAGES);
-	data_load_mnist(label_data, data, LOAD_LABELS);
+	data_load_mnist(image_data, train_dataset, LOAD_IMAGES);
+	data_load_mnist(label_data, train_dataset, LOAD_LABELS);
 
-	net_train(net, data, 1);
+	net_train(net, train_dataset, epochs);
 
 	net_free(net);
-	data_free(data);
+	data_free(train_dataset);
 
 	return 0;
 }
