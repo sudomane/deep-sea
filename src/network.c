@@ -227,6 +227,22 @@ static void _net_init_y(network_t* net, double* y)
         net->y->array[i] = y[i];
 }
 
+static int _net_check_pred(network_t* net)
+{
+    int pred = 1;
+    
+    for(size_t i = 0; i < net->output_size; i++)
+    {
+        if (net->a[net->L - 1]->array[i] != net->y->array[i])
+        {
+            pred = 0;
+            break;
+        }
+    }
+
+    return pred;
+}
+
 /* NETWORK PUBLIC API */
 
 /**
@@ -334,7 +350,6 @@ network_t* net_load(const char* path)
 
     return net;
 }
-
 
 /**
  * @brief Save network's weights and biases in a file
@@ -446,7 +461,42 @@ void net_train(network_t* net, dataset_t* data, size_t epochs)
         }    
     }
     
-    printf("\nCompleted %zu epochs!\n", epochs);
+    printf("\nCompleted %zu epochs!\n\n", epochs);
+}
+
+void net_evaluate(network_t* net, dataset_t* dataset)
+{
+    double accuracy = 0.f;
+    printf("\n[Evaluating]\n");
+    
+    for (size_t p = 0; p < dataset->n; p++)
+    {
+        _net_init_X(net, dataset->X[p]);
+        _net_init_y(net, dataset->y[p]);
+        
+        _net_feed_forward(net);
+
+        for(size_t i = 0; i < net->output_size; i++)
+        {
+            if (net->a[net->L - 1]->array[i] > 0.75f)
+                net->a[net->L - 1]->array[i] = 1.f;
+            else
+                net->a[net->L - 1]->array[i] = 0.f;
+        }
+
+        for (size_t i = 0; i < net->output_size; i++)
+        {
+            printf("[%zu] - y_h: %f ", i, net->a[net->L - 1]->array[i]);
+            printf("y: %f ", net->y->array[i]);
+            printf("\n");
+        }
+
+        accuracy += (double) _net_check_pred(net);
+    }
+
+    accuracy /= dataset->n;
+
+    printf("\nNetwork accuracy: [%f]%%\n\n", accuracy * 100);
 }
 
 /**

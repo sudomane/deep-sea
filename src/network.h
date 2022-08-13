@@ -45,7 +45,7 @@ void net_save(network_t* net, const char* dst);
 void net_display(network_t* net);
 void net_train(network_t* net, dataset_t* dataset, size_t epochs);
 
-void net_evaluate(network_t* net);
+void net_evaluate(network_t* net, dataset_t* dataset);
 void net_predict(network_t* net, double* X);
 
 #endif // NETWORK_H
