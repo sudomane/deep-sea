@@ -4,15 +4,13 @@
 
 This project implements a multi-layer perceptron neural network architecture in the C programming language.
 
-The network has been tested as an OCR to recognize hand-written digits from the MNIST dataset.
+The network has been tested as an OCR, and was able to accurately recognize hand-written digits from the MNIST dataset.
 
 The network is matrix based, calculations are performed via matrix operations, allowing for easy implementation of feed forward, backpropagation and gradient descent algorithms.
 
 ## MNIST dataset
 
-The network was tested and trained with the MNIST hand-written digit dataset. The accuracy of the network has yet to be benchmarked.
-
-To download the dataset, simply run the `download_data.sh` script.
+To test the network with the dataset, simply run the `download_data.sh` script to download the MNIST dataset, and execute the ocr binary.
 
 ## Running the project
 
@@ -25,7 +23,7 @@ make mkdir # Generates the bin/ and obj/ folders
 make
 ```
 
-* Run the binary
+* Execute the binary
 ```bash
 ./bin/ocr
 ```
