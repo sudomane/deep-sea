@@ -31,24 +31,27 @@ static void _net_alloc_layers(network_t* net)
     net->w = calloc(net->L, sizeof(matrix_t*));
     net->b = calloc(net->L, sizeof(matrix_t*));
     net->delta = calloc(net->L, sizeof(matrix_t*));
+    net->grad_w = calloc(net->L, sizeof(matrix_t*));
+    net->grad_b = calloc(net->L, sizeof(matrix_t*));
 
     net->X = m_init(1, net->input_size);
     net->y = m_init(1, net->output_size);
 
-    net->a[0] = m_init(1, net->hidden_size);
-    net->z[0] = m_init(1, net->hidden_size);
-    net->b[0] = m_init(1, net->hidden_size);
-    net->delta[0] = m_init(1, net->hidden_size);
-
-    net->w[0] = m_init(net->input_size, net->hidden_size);
-
-    for (size_t l = 1; l < net->L - 1; l++)
+    for (size_t l = 0; l < net->L - 1; l++)
     {
         net->a[l] = m_init(1, net->hidden_size);
         net->z[l] = m_init(1, net->hidden_size);
         net->b[l] = m_init(1, net->hidden_size);
         net->delta[l] = m_init(1, net->hidden_size);
+        net->grad_b[l] = m_init(1, net->hidden_size);
+    }
 
+    net->w[0] = m_init(net->input_size, net->hidden_size);
+    net->grad_w[0] = m_init(net->input_size, net->hidden_size);
+    
+    for (size_t l = 1; l < net->L - 1; l++)
+    {
+        net->grad_w[l] = m_init(net->hidden_size, net->hidden_size);
         net->w[l] = m_init(net->hidden_size, net->hidden_size);
     }
 
@@ -56,7 +59,8 @@ static void _net_alloc_layers(network_t* net)
     net->z[net->L - 1] = m_init(1, net->output_size);
     net->b[net->L - 1] = m_init(1, net->output_size);
     net->delta[net->L - 1] = m_init(1, net->output_size);
-
+    net->grad_w[net->L - 1] = m_init(net->hidden_size, net->output_size);
+    net->grad_b[net->L - 1] = m_init(1, net->output_size);
     net->w[net->L - 1] = m_init(net->hidden_size, net->output_size);
 }
 
@@ -77,6 +81,8 @@ static void _net_free_layers(network_t* net)
         m_free(net->b[l]);
         m_free(net->delta[l]);
         m_free(net->w[l]);
+        m_free(net->grad_b[l]);
+        m_free(net->grad_w[l]);
     }
     
     free(net->a);
@@ -84,6 +90,8 @@ static void _net_free_layers(network_t* net)
     free(net->w);
     free(net->b);
     free(net->delta);
+    free(net->grad_b);
+    free(net->grad_w);
 }
 
 /**
@@ -145,41 +153,51 @@ static void _net_backprop(network_t* net)
 }
 
 /**
- * @brief Update network weights with delta layer
+ * @brief Computes gradient descent on training examples of determined batch size 
  * 
  * @param net Neural network struct
  */
-static void _net_update_weights(network_t* net)
+static void _net_mini_batch(network_t* net)
 {
-    double lr = 1;
-
-    for (size_t l = net->L - 1; l > 0; l--)
+    matrix_t* grad_w;
+    matrix_t* a_T;
+    
+    for (int l = net->L - 1; l >= 0; l--)
     {
-        matrix_t* a_trans = m_transpose(net->a[l-1]);
-        matrix_t* w_copy = m_copy(net->w[l]);
-        
-        m_scalar_mul(net->w[l], lr, net->w[l]);
-        m_mul(a_trans, net->delta[l], net->w[l]);
-        m_sub(w_copy, net->w[l], net->w[l]);
+        if (l == 0)
+            a_T = m_transpose(net->X);
+        else
+            a_T = m_transpose(net->a[l - 1]);
 
-        m_free(a_trans);
-        m_free(w_copy);
+        grad_w = m_copy(net->grad_w[l]);
+        
+        m_mul(a_T, net->delta[l], grad_w);
+        m_add(grad_w, net->grad_w[l], net->grad_w[l]);
+        m_add(net->delta[l], net->grad_b[l], net->grad_b[l]);
+
+        m_free(a_T);
+        m_free(grad_w);
     }
 }
 
 /**
- * @brief Update network biases with delta layer
+ * @brief Update network weights and biases with delta layer
  * 
  * @param net Neural network struct
  */
-static void _net_update_bias(network_t* net)
+static void _net_update(network_t* net)
 {
-    double lr = 0.01;
+    double lr = net->lr / net->batch_size;
 
-    for (size_t l = net->L - 1; l > 0; l--)
+    for (int l = net->L - 1; l >= 0; l--)
     {
-        m_scalar_mul(net->delta[l], lr, net->delta[l]);
-        m_sub(net->b[l], net->delta[l], net->b[l]);
+        // Weight update
+        m_scalar_mul(net->grad_w[l], lr, net->grad_w[l]);
+        m_sub(net->w[l], net->grad_w[l], net->w[l]);
+        
+        // Bias update
+        m_scalar_mul(net->grad_b[l], lr, net->grad_b[l]);
+        m_sub(net->b[l], net->grad_b[l], net->b[l]);
     }
 }
 
@@ -218,14 +236,16 @@ static void _net_init_y(network_t* net, double* y)
  * @param L Number of layers in the network, excluding the input layer
  * @return network_t* Pointer to the initialized neural network struct
  */
-network_t* net_init(size_t input_size, size_t hidden_size, size_t output_size, size_t L)
+network_t* net_init(size_t L, size_t input_size, size_t hidden_size, size_t output_size, size_t batch_size, double lr)
 {
     network_t* net = malloc(sizeof(network_t));
 
+    net->L = L;
     net->input_size = input_size;
     net->hidden_size = hidden_size;
     net->output_size = output_size;
-    net->L = L;
+    net->batch_size = batch_size;
+    net->lr = lr;
 
     _net_alloc_layers(net);
     _net_init_layers(net);
@@ -256,13 +276,13 @@ void net_display(network_t* net)
     printf("Input layer:\n");
     m_display(net->X);
 
-    printf("Z-Activation:\n");
-    for (size_t l = 0; l < net->L; l++)
-        m_display(net->z[l]);
-
     printf("Activation:\n");
     for (size_t l = 0; l < net->L; l++)
         m_display(net->a[l]);
+
+    printf("Z-Activation:\n");
+    for (size_t l = 0; l < net->L; l++)
+        m_display(net->z[l]);
 
     printf("Weights:\n");
     for (size_t l = 0; l < net->L; l++)
@@ -285,6 +305,7 @@ void net_display(network_t* net)
  */
 void net_train(network_t* net, size_t epochs)
 {
+    // Todo: Pass dataset externally
     double X_train[4][2] = {
 		{0.f, 0.f},
 		{0.f, 1.f},
@@ -299,30 +320,52 @@ void net_train(network_t* net, size_t epochs)
 		{0.f}
 	};
 
-    size_t index = 0;
-
     for (size_t i = 0; i < epochs; i++)
     {
-        size_t X_rand = rand() % 4;
-        size_t y_rand = rand() % 4;
+        for (size_t l = 0; l < net->L; l++)
+        {
+            m_reset(net->delta[l]);
+            m_reset(net->grad_b[l]);
+            m_reset(net->grad_w[l]);
+        }
+        
+        for (size_t j = 0; j < net->batch_size; j++)
+        {
+            double* X = X_train[j];
+            double* y = y_train[j];
 
-        double* X = X_train[index];
-        double* y = y_train[index];
+            _net_init_X(net, X);
+            _net_init_y(net, y);
 
-        _net_init_X(net, X);
-        _net_init_y(net, y);
-
-        _net_feed_forward(net);
-        _net_backprop(net);
-        _net_update_weights(net);
-        _net_update_bias(net);
+            _net_feed_forward(net);
+            _net_backprop(net);
+            _net_mini_batch(net);
+        }
+        
+        _net_update(net);
     }
 
     printf("Completed %zu epochs!\n", epochs);
+}
 
-    printf("\nInput: %f, %f\n\n", X_train[index][0], X_train[index][1]);
-    
-    printf("Prediction:\t%f\nExpected\t%f\n",
-            net->a[net->L-1]->array[0],
-            y_train[index][0]);
+/**
+ * @brief Predict output on network with dataset
+ * 
+ * @param net Network to perform the prediction
+ * @param X Dataset to predict with
+ */
+void net_predict(network_t* net, double* X)
+{
+    _net_init_X(net, X);
+    _net_feed_forward(net);
+
+    printf("INPUT:\n");
+    for (size_t i = 0; i < net->input_size; i++)
+        printf("\t%f\n", X[i]);
+        
+    printf("PREDICTED:\n");
+    for (size_t i = 0; i < net->output_size; i++)
+        printf("\t%f\n", net->a[net->L-1]->array[i]);
+
+    printf("\n");
 }
