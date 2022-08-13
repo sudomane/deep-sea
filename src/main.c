@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
 	size_t output_size = 	10;
 	
 	size_t n_train_data = 	256;
-	size_t n_test_data = 	1;
+	size_t n_test_data = 	128;
 
 	size_t batch_size = 	64;
 
