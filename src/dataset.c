@@ -16,6 +16,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "utils.h"
+
 /**
  * @brief 
  * 
@@ -115,6 +117,12 @@ void data_shuffle(dataset_t* data)
     }
 }
 
+/**
+ * @brief Reverse byte order in integer i
+ * 
+ * @param i Integer to reverse
+ * @return Reversed integer
+ */
 static int _data_reverse_int(int i)
 {
     unsigned char c_1, c_2, c_3, c_4;
@@ -127,6 +135,14 @@ static int _data_reverse_int(int i)
     return ((int) c_1 << 24) + ((int) c_2 << 16) + ((int) c_3 << 8) + c_4;
 }
 
+/**
+ * @brief Load an MNIST dataset into the dataset struct
+ * 
+ * @param path Path to MNIST image or label dataset 
+ * @param data Dataset struct to copy MNIST dataset to
+ * @param load_type Dataset to load (images, or labels).
+ *                  LOAD_IMAGES to load images, LOAD_LABELS to load labels
+ */
 void data_load_mnist(const char* path, dataset_t* data, int load_type)
 {
     int fd = open(path, O_RDONLY);
@@ -159,18 +175,23 @@ void data_load_mnist(const char* path, dataset_t* data, int load_type)
     }
 
     if (load_type == LOAD_IMAGES)
-        printf("READ: %d %d %d\n", n_images, n_rows, n_cols);
+        printf("Found:\t%d\t[Images] of (%dx%d)\n", n_images, n_rows, n_cols);
     else
-        printf("READ: %d \n", n_images);
+        printf("Found:\t%d\t[Labels]\n", n_images);
   
 
-    if (data->n >= (size_t) n_images)
+    if (data->n > (size_t) n_images)
     {
         warnx("WARNING::LOAD DATASET: Expected %zu elements, got %zu. "
               "Setting data->n to %zu.",
               (size_t) n_images, data->n, (size_t) n_images);
         data->n = n_images;
     }
+
+    if (load_type == LOAD_IMAGES)
+        printf("Loaded: %zu\t[Images] of (%dx%d)\n\n", data->n, n_rows, n_cols);
+    else
+        printf("Loaded: %zu\t[Labels]\n", data->n);
 
     if (load_type == LOAD_IMAGES)
     {
@@ -181,7 +202,10 @@ void data_load_mnist(const char* path, dataset_t* data, int load_type)
                 unsigned char tmp;
                 read(fd, &tmp, sizeof(unsigned char));
 
-                data->X[n][i] = (double) tmp / 255.f;
+                
+                double x = ((double) tmp / 255.f);
+                double normalized = normalize(x);
+                data->X[n][i] = normalized;
             }
         }
     }
@@ -190,13 +214,10 @@ void data_load_mnist(const char* path, dataset_t* data, int load_type)
     {
         for (size_t n = 0; n < data->n; n++)
         {
-            for(size_t i = 0; i < data->n_output; i++)
-            {
-                unsigned char tmp;
-                read(fd, &tmp, sizeof(unsigned char));
+            unsigned char tmp;
+            read(fd, &tmp, sizeof(unsigned char));
 
-                data->y[n][i]= (int)tmp;
-            }
+            data->y[n][(int)tmp] = 1;
         }
     }
 

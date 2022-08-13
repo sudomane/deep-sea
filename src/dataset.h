@@ -21,7 +21,7 @@ typedef struct
     size_t n_input;     // Input size
     size_t n_output;    // Output size
     double** X;
-    int** y;
+    double** y;
 }dataset_t;
 
 dataset_t* data_init(size_t n, size_t input_size, size_t output_size);
