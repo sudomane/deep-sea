@@ -39,6 +39,9 @@ typedef struct
 network_t* net_init(size_t L, size_t input_size, size_t hidden_size, size_t output_size, size_t batch_size, double lr);
 void net_free(network_t* net);
 
+network_t* net_load(const char* path);
+void net_save(network_t* net, const char* dst);
+
 void net_display(network_t* net);
 void net_train(network_t* net, dataset_t* dataset, size_t epochs);
 

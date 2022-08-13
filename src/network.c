@@ -11,9 +11,11 @@
 #include "network.h"
 
 #include <err.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "utils.h"
 
@@ -266,6 +268,115 @@ void net_free(network_t* net)
 
     net = NULL;
 }
+
+/**
+ * @brief Load network from file and create network struct
+ * 
+ * @param path Path to network parameters file
+ * @return network_t* 
+ */
+network_t* net_load(const char* path)
+{
+    int fd = open(path, O_RDONLY);
+    
+    if (fd == -1)
+        errx(-1, "ERROR::NETWORK::LOAD : Invalid path %s ", path);
+
+    size_t L = 0;
+    size_t input_size = 0;
+    size_t hidden_size = 0;
+    size_t output_size = 0;
+    size_t batch_size = 0;
+    double lr = 0;
+
+    read(fd, &L, sizeof(size_t));
+    read(fd, &input_size, sizeof(size_t));
+    read(fd, &hidden_size, sizeof(size_t));
+    read(fd, &output_size, sizeof(size_t));
+    read(fd, &batch_size, sizeof(size_t));
+    read(fd, &lr, sizeof(double));
+
+    network_t* net = net_init(L, input_size,
+                                 hidden_size,
+                                 output_size,
+                                 batch_size, lr);
+    
+    for (size_t l = 0; l < net->L; l++)
+    {
+        double val;
+        
+        size_t w_limit = net->hidden_size * net->hidden_size;
+        size_t b_limit = net->hidden_size;
+
+        if (l == 0)
+            w_limit = net->input_size * net->hidden_size;
+        
+        if (l == net->L-1)
+        {
+            w_limit = net->output_size * net->hidden_size;
+            b_limit = net->output_size;
+        }
+        
+        for (size_t i = 0; i < b_limit; i++)
+        {
+            val = read(fd, &val, sizeof(double));
+            net->b[l]->array[i] = val;
+        }
+
+        for (size_t i = 0; i < w_limit; i++)
+        {
+            val = read(fd, &val, sizeof(double));
+            net->w[l]->array[i] = val;
+        }
+    }
+
+    close(fd);
+
+    return net;
+}
+
+
+/**
+ * @brief Save network's weights and biases in a file
+ * 
+ * @param net Network to save
+ * @param dst File to save network to
+ */
+void net_save(network_t* net, const char* dst)
+{
+    int fd = open(dst, (O_WRONLY));
+
+    write(fd, &net->L, sizeof(size_t));
+    write(fd, &net->input_size, sizeof(size_t));
+    write(fd, &net->hidden_size, sizeof(size_t));
+    write(fd, &net->output_size , sizeof(size_t));
+    write(fd, &net->batch_size, sizeof(size_t));
+    write(fd, &net->lr, sizeof(double));
+
+    for (size_t l = 0; l < net->L; l++)
+    {
+        size_t w_limit = net->hidden_size * net->hidden_size;
+        size_t b_limit = net->hidden_size;
+
+        if (l == 0)
+            w_limit = net->input_size * net->hidden_size;
+        
+        if (l == net->L-1)
+        {
+            w_limit = net->output_size * net->hidden_size;
+            b_limit = net->output_size;
+        }
+        
+        for (size_t i = 0; i < b_limit; i++)
+            write(fd, &net->b[l]->array[i], sizeof(double));
+
+        for (size_t i = 0; i < w_limit; i++)
+            write(fd, &net->w[l]->array[i], sizeof(double));
+    }
+
+    close(fd);
+}
+
 
 /**
  * @brief Displays the network's various parameters, and their contents
