@@ -52,7 +52,7 @@ double d_sigmoid(double x)
  */
 double relu(double x)
 {
-    return x > 0.f ? 0.01f * x : 0.f;
+    return x > 0.f ? x : 0.f;
 }
 
 /**
@@ -63,5 +63,5 @@ double relu(double x)
  */
 double d_relu(double x)
 {
-    return x > 0.f ? 0.01f : 0.f;
+    return x > 0.f ? 1.f : 0.f;
 }
