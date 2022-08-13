@@ -323,6 +323,7 @@ void net_train(network_t* net, size_t epochs)
 
     for (size_t i = 0; i < epochs; i++)
     {
+        printf("Epoch %zu / %zu\n", i+1, epochs);
         for (size_t l = 0; l < net->L; l++)
         {
             m_reset(net->delta[l]);
@@ -346,7 +347,7 @@ void net_train(network_t* net, size_t epochs)
         
         _net_update(net);
     }
-
+    system("clear");
     printf("Completed %zu epochs!\n", epochs);
 }
 
