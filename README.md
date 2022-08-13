@@ -1,8 +1,10 @@
-# cl-OCR (Command line OCR)
+# C Neural Network
 
 ## What is this project?
 
-This project aims to implement a multi-layer perceptron network in the C programming language, for speed and memory efficiency. Using this network implementation, the goal of this project is to re-create an OCR capable of recognizing hand-written digits with high accuracy, and low compute time.
+This project implements a multi-layer perceptron neural network architecture in the C programming language.
+
+The network has been tested as an OCR to recognize hand-written digits from the MNIST dataset.
 
 The network is matrix based, calculations are performed via matrix operations, allowing for easy implementation of feed forward, backpropagation and gradient descent algorithms.
 
@@ -13,6 +15,8 @@ The network was tested and trained with the MNIST hand-written digit dataset. Th
 To download the dataset, simply run the `download_data.sh` script.
 
 ## Running the project
+
+No additional dependencies are required to compile the project.
 
 * Compile the source code
 ```bash
@@ -26,7 +30,7 @@ make
 ./bin/ocr
 ```
 
-## Todo list
+## Roadmap
 
 * [x] Design efficient memory based neural network structure
 * [x] Implement matrix library
