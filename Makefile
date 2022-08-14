@@ -1,9 +1,9 @@
 # Tool macros
 CC := clang
-CCFLAGS := -Wall -Wextra -Werror
+CCFLAGS := 
 CCDBGFLAGS := -g
 CCOBJFLAGS := $(CCFLAGS) -c
-CCLIBS := -lm
+CCLIBS := -lm -lpthread
 
 # Path macros
 SRC_PATH := src
