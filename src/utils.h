@@ -1,7 +1,7 @@
 /**
  * @file    utils.h
  * @author  Philippe Bouchet (philippe.bouchet@epita.fr)
- * @brief   Utility functions, mathematical formulas, etc...
+ * @brief   General purpose utility functions, mathematical formulas, etc...
  * 
  * @copyright Copyright (c) 2022
  * 

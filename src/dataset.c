@@ -134,7 +134,7 @@ void data_shuffle(dataset_t* data)
  */
 void data_load_mnist(const char* path, dataset_t* data, int load_type)
 {
-    printf("[LOADING DATASET]\n\n");
+    printf("\n[LOADING DATASET]\n\n");
     int fd = open(path, O_RDONLY);
     
     if (fd == -1)
@@ -193,7 +193,6 @@ void data_load_mnist(const char* path, dataset_t* data, int load_type)
 
     if (load_type == LOAD_IMAGES)
     {
-        // Reduce amount of read syscalls to O(n)
         for (size_t n = 0; n < data->n; n++)
         {
             for (size_t i = 0; i < data->n_input; i++)

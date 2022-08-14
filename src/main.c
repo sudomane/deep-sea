@@ -32,8 +32,9 @@ int main(int argc, char* argv[])
 				 "./main network.save - Evaluate existing network model\n"
 				 "./main - Train and save new network.");
 
-	srand(0);
-		
+	srand(0);	
+	system("clear");
+	
 	if (argc == 2)
 		evaluate_network(argv[1]);
 	else
@@ -48,9 +49,9 @@ static network_t* _configure_network()
 	
 	double lr;
 
-	printf("[CONFIGURE NETWORK PARAMETERS]\n\n");
+	printf("\n[CONFIGURE NETWORK PARAMETERS]\n\n");
 
-	printf("Layers (w/ output):\t");
+	printf("Hidden layers:\t");
 	scanf("%zu", &L);
 	printf("Input size:\t");
 	scanf("%zu", &input_size);
@@ -64,10 +65,10 @@ static network_t* _configure_network()
 	scanf("%lf", &lr);
 	printf("\n");
 	
-	network_t* net = net_init(L, input_size,
-								 hidden_size,
-								 output_size,
-								 batch_size, lr);
+	network_t* net = net_init(L+1, input_size,
+								   hidden_size,
+								   output_size,
+								   batch_size, lr);
 
 	return net;
 }
@@ -76,7 +77,7 @@ static void evaluate_network(char* network_path)
 {
 	size_t n_test_data;
 
-	printf("[NETWORK EVALUATION]\n\n");
+	printf("\n[NETWORK EVALUATION]\n\n");
 	printf("Quantity of testing data >>\t");
 	scanf("%zu", &n_test_data);
 	
@@ -84,8 +85,6 @@ static void evaluate_network(char* network_path)
 	dataset_t* test_dataset = data_init(n_test_data,
 										net->input_size,
 										net->output_size);
-
-	net_summary(net);
 	
 	data_load_mnist(TEST_IMAGE_DATA, test_dataset, LOAD_IMAGES);
 	data_load_mnist(TEST_LABEL_DATA, test_dataset, LOAD_LABELS);
@@ -100,17 +99,19 @@ static void train_network()
 {
 	size_t epochs;
 	size_t n_train_data;
-	
-	network_t* net = _configure_network();
-	
-	printf("Epochs: >>\t");
+		
+	printf("Epochs to train:\t");
 	scanf("%zu", &epochs);
-	printf("Quantity of training data >>\t");
+	printf("N training data:\t");
 	scanf("%zu", &n_train_data);
 
+	network_t* net = _configure_network();
+
 	if (net->batch_size > n_train_data)
-		errx(-1, "MAIN::NETWORK :"
+	{
+		errx(-1, "MAIN::NETWORK: "
 				 "Batch size greater than train data quantity.");
+	}
 
 	dataset_t* train_dataset = data_init(n_train_data,
 										 net->input_size,

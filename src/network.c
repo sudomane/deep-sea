@@ -223,6 +223,7 @@ void net_train(network_t* net, dataset_t* data, size_t epochs)
 
 /**
  * @brief Calculate network accuracy on test dataset.
+ *        Output is thresholded at 0.95.
  * 
  * @param net Neural network struct
  * @param dataset Test dataset
@@ -238,10 +239,9 @@ void net_evaluate(network_t* net, dataset_t* dataset)
         _net_init_y(net, dataset->y[p]);
         
         _net_feed_forward(net);
-
         _net_binarize_output(net, 0.95f);
 
-        accuracy = accuracy + _net_evaluate_prediction(net);
+        accuracy += _net_evaluate_prediction(net);
     }
 
     accuracy /= dataset->n;
@@ -250,10 +250,10 @@ void net_evaluate(network_t* net, dataset_t* dataset)
 }
 
 /**
- * @brief Predict output on network with dataset
+ * @brief Predict output on network with single input
  * 
  * @param net Network to perform the prediction
- * @param X Dataset to predict with
+ * @param X Input to predict with
  */
 void net_predict(network_t* net, double* X)
 {
@@ -505,7 +505,7 @@ static double _net_evaluate_prediction(network_t* net)
 
 /**
  * @brief Binarizes the network's prediction, for comparability with
- *        the expected output array.
+ *        the expected output array. Threshold usually at 0.95.
  * 
  * @param net Neural network struct
  * @param threshold All values above the threshold are set to 1.
