@@ -1,7 +1,7 @@
 /**
  * @file    dataset.c
  * @author  Philippe Bouchet (philippe.bouchet@epita.fr)
- * @brief 
+ * @brief   Dataset API implementation.
  * 
  * @copyright Copyright (c) 2022
  * 
@@ -18,11 +18,18 @@
 
 #include "utils.h"
 
+/* Internal API forward declaration. */
+
+static int _data_reverse_int(int i);
+
+
+/* ==== DATASET PUBLIC API ==== */
+
 /**
- * @brief 
+ * @brief Initialize dataset
  * 
- * @param n Number of elements in dataset 
- * @param input_size
+ * @param n Number of elements in dataset
+ * @param input_size 
  * @param output_size 
  * @return dataset_t* 
  */
@@ -118,24 +125,6 @@ void data_shuffle(dataset_t* data)
 }
 
 /**
- * @brief Reverse byte order in integer i
- * 
- * @param i Integer to reverse
- * @return Reversed integer
- */
-static int _data_reverse_int(int i)
-{
-    unsigned char c_1, c_2, c_3, c_4;
-    
-    c_1 = i & 255;
-    c_2 = (i >> 8) & 255;
-    c_3 = (i >> 16) & 255;
-    c_4 = (i >> 24) & 255;
-
-    return ((int) c_1 << 24) + ((int) c_2 << 16) + ((int) c_3 << 8) + c_4;
-}
-
-/**
  * @brief Load an MNIST dataset into the dataset struct
  * 
  * @param path Path to MNIST image or label dataset 
@@ -145,11 +134,16 @@ static int _data_reverse_int(int i)
  */
 void data_load_mnist(const char* path, dataset_t* data, int load_type)
 {
+    printf("[LOADING DATASET]\n\n");
     int fd = open(path, O_RDONLY);
     
     if (fd == -1)
-        errx(-1, "ERROR::DATASET::LOAD : Could not open file: %s "
-                 "(Invalid path, or corrupted file).", path);
+    {
+        errx(DATASET_FAILED_LOAD,
+             "DATASET::ERROR::LOAD: "
+             "Could not open file: %s (Invalid path, or corrupted file).",
+             path);
+    }
 
     int magic =     0;
     int n_images =  0;
@@ -172,6 +166,14 @@ void data_load_mnist(const char* path, dataset_t* data, int load_type)
     {
         n_rows = _data_reverse_int(n_rows);
         n_cols = _data_reverse_int(n_cols);
+
+        if (data->n_input != (size_t) n_rows * (size_t) n_cols)
+        {
+            errx(DATASET_INPUT_MISMATCH,
+                 "DATASET::ERROR::INCOMPATIBLE SIZE: "
+                 "Input size mismatch (%zu) with dataset input (%zu)",
+                 data->n_input, (size_t) (n_rows*n_cols));
+        }
     }
 
     if (load_type == LOAD_IMAGES)
@@ -182,16 +184,12 @@ void data_load_mnist(const char* path, dataset_t* data, int load_type)
 
     if (data->n > (size_t) n_images)
     {
-        warnx("WARNING::DATASET::INCOMPATIBLE SIZE: Expected %zu elements, got %zu. "
-              "Setting data->n to %zu.",
+        warnx("DATASET::WARNING::INCOMPATIBLE SIZE: "
+              "Expected %zu elements, got %zu. Lowering to %zu.",
               (size_t) n_images, data->n, (size_t) n_images);
+        
         data->n = n_images;
     }
-
-    if (load_type == LOAD_IMAGES)
-        printf("Loaded: %zu\t[Images] of (%dx%d)\n\n", data->n, n_rows, n_cols);
-    else
-        printf("Loaded: %zu\t[Labels]\n", data->n);
 
     if (load_type == LOAD_IMAGES)
     {
@@ -220,5 +218,33 @@ void data_load_mnist(const char* path, dataset_t* data, int load_type)
         }
     }
 
+    if (load_type == LOAD_IMAGES)
+        printf("Loaded: %zu\t[Images] of (%dx%d)\n\n",
+                data->n, n_rows, n_cols);
+    else
+        printf("Loaded: %zu\t[Labels]\n\n", data->n);
+
     close(fd);
+}
+
+
+/* ==== DATASET INTERNAL API ==== */
+
+
+/**
+ * @brief  Reverse byte order in integer i
+ * 
+ * @param  i Integer to reverse
+ * @return Reversed integer
+ */
+static int _data_reverse_int(int i)
+{
+    unsigned char c_1, c_2, c_3, c_4;
+    
+    c_1 = i & 255;
+    c_2 = (i >> 8) & 255;
+    c_3 = (i >> 16) & 255;
+    c_4 = (i >> 24) & 255;
+
+    return ((int) c_1 << 24) + ((int) c_2 << 16) + ((int) c_3 << 8) + c_4;
 }

@@ -23,14 +23,14 @@ double normalized_rand(void)
 }
 
 /**
- * @brief Normalizes range [0, 255] to [0, 1]
+ * @brief Normalizes range [0, 255] to [-1, 1]
  * 
  * @param x Value to normalize
  * @return Normalized value
  */
 double normalize(double x)
 {
-    return x / 255.f;
+    return 2 * ( x / 255.f) - 1;
 }
 
 /**

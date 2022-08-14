@@ -1,3 +1,12 @@
+/**
+ * @file	main.c
+ * @author 	Philippe Bouchet (philippe.bouchet@epita.fr)
+ * @version 0.1
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
+
 #include <err.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,54 +22,106 @@
 #define TEST_IMAGE_DATA "data/t10k-images-idx3-ubyte"
 #define TEST_LABEL_DATA "data/t10k-labels-idx1-ubyte"
 
+static void train_network();
+static void evaluate_network(char* network_path);
+
 int main(int argc, char* argv[])
 {
-	if (argc != 2)
-	{
-		errx(-42, "Correct usage:\n\t./main epochs");
-	}
+	if (argc > 2)
+		errx(-1, "Invalid arguments provided. Correct use:\n.\n"
+				 "./main network.save - Evaluate existing network model\n"
+				 "./main - Train and save new network.");
 
-	srand(time(NULL));
+	srand(0);
+		
+	if (argc == 2)
+		evaluate_network(argv[1]);
+	else
+		train_network();
 	
-	const char* train_image_data = 	TRAIN_IMAGE_DATA;
-	const char* train_label_data =	TRAIN_LABEL_DATA;
+	return 0;
+}
 
-	const char* test_image_data =	TEST_IMAGE_DATA;
-	const char* test_label_data =	TEST_LABEL_DATA;
-
-	size_t epochs =		 	(size_t) atoi(argv[1]);
+static network_t* _configure_network()
+{
+	size_t L, input_size, hidden_size, output_size, batch_size;
 	
-	size_t L =			 	7;
-	size_t input_size =		784;
-	size_t hidden_size = 	32;
-	size_t output_size = 	10;
-	
-	size_t n_train_data = 	256;
-	size_t n_test_data = 	128;
+	double lr;
 
-	size_t batch_size = 	64;
+	printf("[CONFIGURE NETWORK PARAMETERS]\n\n");
 
-	double lr = 			0.1f;
+	printf("Layers (w/ output):\t");
+	scanf("%zu", &L);
+	printf("Input size:\t");
+	scanf("%zu", &input_size);
+	printf("Hidden size:\t");
+	scanf("%zu", &hidden_size);
+	printf("Output size:\t");
+	scanf("%zu", &output_size);
+	printf("Batch size:\t");
+	scanf("%zu", &batch_size);
+	printf("Learning rate:\t");
+	scanf("%lf", &lr);
+	printf("\n");
 	
-	dataset_t* train_dataset = data_init(n_train_data, input_size, output_size);
-	dataset_t* test_dataset = data_init(n_test_data, input_size, output_size);
-	
-	network_t* net = net_init(L, input_size, hidden_size, output_size, batch_size, lr);
-	
-	data_load_mnist(train_image_data, train_dataset, LOAD_IMAGES);
-	data_load_mnist(train_label_data, train_dataset, LOAD_LABELS);
+	network_t* net = net_init(L, input_size,
+								 hidden_size,
+								 output_size,
+								 batch_size, lr);
 
-	net_train(net, train_dataset, epochs);
+	return net;
+}
 
-	data_load_mnist(test_image_data, test_dataset, LOAD_IMAGES);
-	data_load_mnist(test_label_data, test_dataset, LOAD_LABELS);
+static void evaluate_network(char* network_path)
+{
+	size_t n_test_data;
+
+	printf("[NETWORK EVALUATION]\n\n");
+	printf("Quantity of testing data >>\t");
+	scanf("%zu", &n_test_data);
+	
+	network_t* net = net_load(network_path);
+	dataset_t* test_dataset = data_init(n_test_data,
+										net->input_size,
+										net->output_size);
+
+	net_summary(net);
+	
+	data_load_mnist(TEST_IMAGE_DATA, test_dataset, LOAD_IMAGES);
+	data_load_mnist(TEST_LABEL_DATA, test_dataset, LOAD_LABELS);
 
 	net_evaluate(net, test_dataset);
 
-	//net_save(net, "test.save");
+	net_free(net);
+	data_free(test_dataset);
+}
+
+static void train_network()
+{
+	size_t epochs;
+	size_t n_train_data;
+	
+	network_t* net = _configure_network();
+	
+	printf("Epochs: >>\t");
+	scanf("%zu", &epochs);
+	printf("Quantity of training data >>\t");
+	scanf("%zu", &n_train_data);
+
+	if (net->batch_size > n_train_data)
+		errx(-1, "MAIN::NETWORK :"
+				 "Batch size greater than train data quantity.");
+
+	dataset_t* train_dataset = data_init(n_train_data,
+										 net->input_size,
+										 net->output_size);
+	
+	data_load_mnist(TRAIN_IMAGE_DATA, train_dataset, LOAD_IMAGES);
+	data_load_mnist(TRAIN_LABEL_DATA, train_dataset, LOAD_LABELS);
+
+	net_train(net, train_dataset, epochs);
+	net_save(net, "network.save");
 
 	net_free(net);
 	data_free(train_dataset);
-
-	return 0;
 }
