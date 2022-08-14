@@ -25,7 +25,7 @@ make
 
 * Execute the binary
 ```bash
-./bin/ocr N_epochs
+./bin/ocr [network.save]
 ```
 
 ## Roadmap
