@@ -210,10 +210,10 @@ void data_load_mnist(const char* path, dataset_t* data, int load_type)
     {
         for (size_t n = 0; n < data->n; n++)
         {
-            unsigned char tmp;
-            read(fd, &tmp, sizeof(unsigned char));
+            unsigned char pos;
+            read(fd, &pos, sizeof(unsigned char));
 
-            data->y[n][(int)tmp] = 1;
+            data->y[n][pos] = 1;
         }
     }
 
