@@ -13,8 +13,6 @@
 #include <time.h>
 
 #include "network.h"
-#include "matrix.h"
-#include "utils.h"
 
 #define TRAIN_IMAGE_DATA "data/train-images-idx3-ubyte"
 #define TRAIN_LABEL_DATA "data/train-labels-idx1-ubyte"
