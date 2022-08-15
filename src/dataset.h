@@ -18,7 +18,8 @@
 
 typedef unsigned long size_t;
 
-typedef struct 
+typedef struct
+__attribute__((packed, aligned(1))) 
 {
     size_t      n;           // Number of elements in dataset
     size_t      n_input;     // Input size

@@ -17,6 +17,7 @@
 #include "dataset.h"
 
 typedef struct
+__attribute__((packed, aligned(1)))
 {
     size_t      L;           // n hidden layers + output layer
     size_t      input_size;
