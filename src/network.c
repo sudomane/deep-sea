@@ -202,6 +202,7 @@ void net_train(network_t* net, dataset_t* data, size_t epochs)
         
         data_shuffle(data);
         
+        // Todo: Parallelize batch training
         for (size_t b = 0; b < data->n - net->batch_size + 1; b++)
         {
             for (size_t i = b; i < net->batch_size + b; i++)
