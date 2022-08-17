@@ -8,6 +8,9 @@ The network has been tested as an OCR, and was able to accurately recognize hand
 
 The network is matrix based, calculations are performed via matrix operations, allowing for easy implementation of feed forward, backpropagation and gradient descent algorithms.
 
+## Network accuracy
+The network was tested with the hand-written digits from the MNIST dataset, and has achieved an accuarcy of 82% on a test set of 10000 images, while only being trained on 4096 images out of the 60000 total images of the MNIST dataset, due to CPU limitations. Plans to implement CPU/GPU acceleration are currently a work in progress.
+
 ## MNIST dataset
 
 To test the network with the dataset, simply run the `download_data.sh` script to download the MNIST dataset, and execute the ocr binary.
@@ -39,5 +42,5 @@ make
 * [x] Implement mini batch training in the network for prediction versatility
 * [X] Implement dataset API to easily pass data into the network
 * [x] Test neural network with OCR network trained to recognize handwritten digits
-* [ ] Speed up matrix multiplication with multithread implementation (CPU or GPU)
+* [ ] Parallelize gradient descent with threads
 * [ ] Implement basic cli interface to interact with the network
