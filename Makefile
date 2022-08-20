@@ -1,6 +1,6 @@
 # Tool macros
 CC := clang
-CCFLAGS := -Werror -Wall -Wextra
+CCFLAGS := -Werror -Wall -Wextra -O3
 CCDBGFLAGS := -g
 CCOBJFLAGS := $(CCFLAGS) -c
 CCLIBS := -lm -lpthread
