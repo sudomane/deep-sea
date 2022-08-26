@@ -15,7 +15,7 @@ The network was tested with the hand-written digits from the MNIST dataset, and 
 
 ## MNIST dataset
 
-To test the network with the dataset, simply run the `download_data.sh` script to download the MNIST dataset, and execute the ocr binary.
+To test the network with the dataset, simply execute the `fetch_data` script to download the MNIST dataset, and execute the ocr binary.
 
 ## Running the project
 
