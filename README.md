@@ -1,21 +1,21 @@
-# cOCR
+# DeepSea
 
-## What is this project?
+## What is this DeepSea?
 
-This project implements a multi-layer perceptron neural network architecture in the C programming language.
+DeepSea is a play on words. I originally intended to name this "DeepC", however that name was taken, so I chose the next best thing.
 
-The network has been tested as an OCR, and was able to accurately recognize hand-written digits from the MNIST dataset.
+DeepSea is an experimental deep learning framework for the C programming language.
 
-The network is matrix based, calculations are performed via matrix operations, allowing for easy implementation of feed forward, backpropagation and gradient descent algorithms.
+The framework's network is matrix based, calculations are performed via matrix operations, allowing for easy implementation of feed forward, backpropagation and gradient descent algorithms.
 
 ## Network accuracy
-The network was tested with the hand-written digits from the MNIST dataset, and has achieved an accuarcy of 82% on a test set of 10000 images, while only being trained on 4096 images out of the 60000 total images of the MNIST dataset, due to CPU limitations. Plans to implement CPU/GPU acceleration are currently a work in progress.
+An OCR was implemented and tested with hand written digits from the MNIST dataset, and has achieved an accuarcy of 82% on a test set of 10000 images, while only being trained on 4096 images out of the 60000 total images of the MNIST dataset, due to CPU limitations. Plans to implement CPU/GPU acceleration are currently a work in progress.
 
 ![](https://i.imgur.com/xa4Z45A.png)
 
 ## MNIST dataset
 
-To test the network with the dataset, simply execute the `fetch_data` script to download the MNIST dataset, and execute the ocr binary.
+To test the network with the dataset, simply execute the `fetch_data` script to download the MNIST dataset, and execute the ocr binary. Realistically, the framework can be tested on any MNIST dataset.
 
 ## Running the project
 
@@ -28,7 +28,7 @@ make mkdir # Generates the bin/ and obj/ folders
 make
 ```
 
-* Execute the binary
+* Execute the binary: Optional `network.save` argument to load and evaluate an existing network. If no arguments are provided, the program will create, train and save a new network.
 ```bash
 ./bin/ocr [network.save]
 ```
