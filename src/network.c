@@ -216,7 +216,7 @@ void net_train(network_t* net, dataset_t* data, size_t epochs)
             }
 
             _net_update(net);
-        }    
+        } 
     }
     
     printf("\nCompleted %zu epochs!\n\n", epochs);
@@ -224,7 +224,7 @@ void net_train(network_t* net, dataset_t* data, size_t epochs)
 
 /**
  * @brief Calculate network accuracy on test dataset.
- *        Output is thresholded at 0.95.
+ *        Output is thresholded at 0.8.
  * 
  * @param net Neural network struct
  * @param dataset Test dataset
@@ -240,7 +240,7 @@ void net_evaluate(network_t* net, dataset_t* dataset)
         _net_init_y(net, dataset->y[p]);
         
         _net_feed_forward(net);
-        _net_binarize_output(net, 0.95f);
+        _net_binarize_output(net, 0.8f);
 
         accuracy += _net_evaluate_prediction(net);
     }
@@ -256,14 +256,39 @@ void net_evaluate(network_t* net, dataset_t* dataset)
  * @param net Network to perform the prediction
  * @param X Input to predict with
  */
-void net_predict(network_t* net, double* X)
+void net_predict(network_t* net, double* X, double* y)
 {
     _net_init_X(net, X);
+    _net_init_y(net, y);
     _net_feed_forward(net);
-        
-    printf("[PREDICTED OUTPUT]:\n\n");
+
+    double threshold = 0.8f;
+
+    printf("\n[PREDICTION]:\n\n");
     for (size_t i = 0; i < net->output_size; i++)
-        printf("\t%f\n", net->a[net->L-1]->array[i]);
+    {
+        double predicted_val = net->a[net->L-1]->array[i];
+        double expected_val = y[i];
+
+        printf("[");
+        if (expected_val == 1.0f)
+            printf("\033[0;32m");
+
+        printf("%zu", i);
+        printf("\033[0m] - ");
+
+        if (predicted_val > threshold)
+            printf("\033[0;32m");
+
+        printf("Predicted: %f ", net->a[net->L-1]->array[i]);
+        printf("\033[0m - ");
+
+        if (expected_val > threshold)
+            printf("\033[0;32m");
+
+        printf("Expected: %f\n", y[i]);
+        printf("\033[0m");
+    }
 
     printf("\n");
 }

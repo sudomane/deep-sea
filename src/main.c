@@ -76,7 +76,7 @@ static void evaluate_network(char* network_path)
 	size_t n_test_data;
 
 	printf("\n[NETWORK EVALUATION]\n\n");
-	printf("Quantity of testing data >>\t");
+	printf("N testing data:\t");
 	scanf("%zu", &n_test_data);
 	
 	network_t* net = net_load(network_path);
@@ -88,6 +88,17 @@ static void evaluate_network(char* network_path)
 	data_load_mnist(TEST_LABEL_DATA, test_dataset, LOAD_LABELS);
 
 	net_evaluate(net, test_dataset);
+
+	size_t r;
+	printf("Image to predict [1 - %zu]:\t", test_dataset->n);
+	scanf("%zu", &r);
+	if (r == 0 || r > test_dataset->n)
+	{
+		errx(-1, "MAIN::PREDICTION: Selection out of bounds!");
+	}
+
+	printf("Selected image:\t%zu/%zu\n", r, test_dataset->n);
+	net_predict(net, test_dataset->X[r-1], test_dataset->y[r-1]);
 
 	net_free(net);
 	data_free(test_dataset);

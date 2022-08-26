@@ -53,6 +53,6 @@ void        net_summary(network_t* net);
 void        net_train(network_t* net, dataset_t* dataset, size_t epochs);
 
 void        net_evaluate(network_t* net, dataset_t* dataset);
-void        net_predict(network_t* net, double* X);
+void        net_predict(network_t* net, double* X, double* y);
 
 #endif // NETWORK_H

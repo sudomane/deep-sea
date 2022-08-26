@@ -30,7 +30,7 @@ double normalized_rand(void)
  */
 double normalize(double x)
 {
-    return 2 * ( x / 255.f) - 1;
+    return 2 * (x / 255.f) - 1;
 }
 
 /**
