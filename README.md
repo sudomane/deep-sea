@@ -11,7 +11,7 @@ The network is matrix based, calculations are performed via matrix operations, a
 ## Network accuracy
 The network was tested with the hand-written digits from the MNIST dataset, and has achieved an accuarcy of 82% on a test set of 10000 images, while only being trained on 4096 images out of the 60000 total images of the MNIST dataset, due to CPU limitations. Plans to implement CPU/GPU acceleration are currently a work in progress.
 
-![](https://i.imgur.com/JXEXlRc.png)
+![](https://i.imgur.com/xa4Z45A.png)
 
 ## MNIST dataset
 
