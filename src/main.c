@@ -89,16 +89,27 @@ static void evaluate_network(char* network_path)
 
 	net_evaluate(net, test_dataset);
 
-	size_t r;
-	printf("Image to predict [1 - %zu]:\t", test_dataset->n);
-	scanf("%zu", &r);
-	if (r == 0 || r > test_dataset->n)
+	int r;
+	
+	while (1)
 	{
-		errx(-1, "MAIN::PREDICTION: Selection out of bounds!");
-	}
+		printf("Image to predict [1 - %zu] (0 to exit):\t", test_dataset->n);
+		scanf("%d", &r);
+		
+		if (r <= 0)
+		{
+			break;
+		}
+		
+		if ((size_t) r > test_dataset->n)
+		{
+			warnx("MAIN::PREDICTION: Selection out of bounds!");
+			continue;
+		}
 
-	printf("Selected image:\t%zu/%zu\n", r, test_dataset->n);
-	net_predict(net, test_dataset->X[r-1], test_dataset->y[r-1]);
+		printf("Selected image:\t%d/%zu\n", r, test_dataset->n);
+		net_predict(net, test_dataset->X[r-1], test_dataset->y[r-1]);
+	}
 
 	net_free(net);
 	data_free(test_dataset);
