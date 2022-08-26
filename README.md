@@ -1,4 +1,4 @@
-# C Neural Network
+# cOCR
 
 ## What is this project?
 
