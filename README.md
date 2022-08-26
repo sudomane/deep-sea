@@ -1,6 +1,6 @@
 # DeepSea
 
-## What is this DeepSea?
+## What is DeepSea?
 
 DeepSea is a play on words. I originally intended to name this "DeepC", however that name was taken, so I chose the next best thing.
 
@@ -30,7 +30,7 @@ make
 
 * Execute the binary: Optional `network.save` argument to load and evaluate an existing network. If no arguments are provided, the program will create, train and save a new network.
 ```bash
-./bin/ocr [network.save]
+./bin/deepsea [network.save]
 ```
 
 ## Roadmap
