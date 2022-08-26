@@ -17,7 +17,7 @@ SRC := $(foreach x, $(SRC_PATH), $(wildcard $(addprefix $(x)/*, .c*)))
 OBJ := $(addprefix $(OBJ_PATH)/, $(addsuffix .o, $(notdir $(basename $(SRC)))))
 
 # Compile macros
-TARGET_NAME := ocr
+TARGET_NAME := deepsea
 DBG_TARGET_NAME := ocr_debug
 ifeq ($(OS), Windows_NT)
 	TARGET_NAME := $(addsuffix .exe, $(TARGET_NAME))
