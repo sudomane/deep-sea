@@ -15,7 +15,7 @@ An OCR was implemented and tested with hand written digits from the MNIST datase
 
 ## MNIST dataset
 
-To test the network with the dataset, simply execute the `fetch_data` script to download the MNIST dataset, and execute the ocr binary. Realistically, the framework can be tested on any MNIST dataset.
+To test the network with the dataset, simply execute the `fetch_data` script to download the MNIST dataset, and execute the DeepSea. Realistically, the framework can be tested on any MNIST dataset.
 
 ## Running the project
 
@@ -28,7 +28,7 @@ make mkdir # Generates the bin/ and obj/ folders
 make
 ```
 
-* Execute the binary: Optional `network.save` argument to load and evaluate an existing network. If no arguments are provided, the program will create, train and save a new network.
+* Execute the binary: Optional path to saved network `network.save` argument to load and evaluate an existing network. If no arguments are provided, the program will create, train and save a new network.
 ```bash
 ./bin/deepsea [network.save]
 ```
