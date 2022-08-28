@@ -8,8 +8,20 @@ DeepSea is an experimental deep learning framework for the C programming languag
 
 The framework's network is matrix based, calculations are performed via matrix operations, allowing for easy implementation of feed forward, backpropagation and gradient descent algorithms.
 
+## Features
+
+The framework currently supports several features, such as:
+
+* Stochastic Gradient Descent
+* Batch Gradient Descent
+* Mini-Batch Gradient Descent
+* MNIST data format compatibility
+* Saving & Loading network parameters (weights & biases)
+
 ## Network accuracy
 An OCR was implemented and tested with hand written digits from the MNIST dataset, and has achieved an accuarcy of 82% on a test set of 10000 images, while only being trained on 4096 images out of the 60000 total images of the MNIST dataset, due to CPU limitations. Plans to implement CPU/GPU acceleration are currently a work in progress.
+
+A pretrained network model `pretrained_network.save`is provided to test the network.
 
 ![](https://i.imgur.com/xa4Z45A.png)
 
