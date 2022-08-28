@@ -2,7 +2,6 @@ a.out
 
 .vscode
 
-*.save
 
 data/*
 bin/*
