@@ -17,6 +17,7 @@ The framework currently supports several features, such as:
 * Mini-Batch Gradient Descent
 * MNIST data format compatibility
 * Saving & Loading network parameters (weights & biases)
+* Matrix operations
 
 ## Network accuracy
 An OCR was implemented and tested with hand written digits from the MNIST dataset, and has achieved an accuarcy of 82% on a test set of 10000 images, while only being trained on 4096 images out of the 60000 total images of the MNIST dataset, due to CPU limitations. Plans to implement CPU/GPU acceleration are currently a work in progress.
