@@ -3,7 +3,10 @@
  * @author 	Philippe Bouchet (philippe.bouchet@epita.fr)
  * @version 0.1
  * 
- * @copyright Copyright (c) 2022
+ * @brief		The goal of the main.c file is to serve as an example as to how
+ * 				DeepSea can be implemented, by showing the workflow expected in an
+ * 				implementation. 
+ * @copyright 	Copyright (c) 2022
  * 
  */
 
